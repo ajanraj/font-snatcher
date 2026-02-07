@@ -1,5 +1,7 @@
 ## Font Snatcher
 
+![Font Snatcher social preview](./public/og-image.png)
+
 Extract web fonts from any public site. Preview, download, match legal alternatives.
 
 ### What it does
@@ -86,3 +88,11 @@ bun run build
 ```
 
 Before production deploy, set `FONT_PROXY_SECRET`.
+
+### Social preview image (OG/Twitter)
+
+- Source file: `public/og-image.png` (expected size `1200x630`).
+- Production URL: `https://fonts.oschat.ai/og-image.png`.
+- Meta tags are set in `src/routes/__root.tsx` via `OG_IMAGE_URL` and used for both:
+  - `og:image`
+  - `twitter:image`

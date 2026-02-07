@@ -14,6 +14,11 @@ interface MyRouterContext {
 }
 
 const themeInitScript = createThemeInitScript();
+const SITE_URL = "https://fonts.oschat.ai";
+const SITE_TITLE = "Font Snatcher";
+const SITE_DESCRIPTION =
+  "Extract web fonts from public sites. Preview, download, and find legal alternatives.";
+const OG_IMAGE_URL = `${SITE_URL}/og-image.png?v=20260207-3`;
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -30,13 +35,61 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: "dark light",
       },
       {
-        title: "Font Snatcher",
+        title: SITE_TITLE,
+      },
+      {
+        name: "description",
+        content: SITE_DESCRIPTION,
+      },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        property: "og:site_name",
+        content: SITE_TITLE,
+      },
+      {
+        property: "og:title",
+        content: SITE_TITLE,
+      },
+      {
+        property: "og:description",
+        content: SITE_DESCRIPTION,
+      },
+      {
+        property: "og:url",
+        content: SITE_URL,
+      },
+      {
+        property: "og:image",
+        content: OG_IMAGE_URL,
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      {
+        name: "twitter:title",
+        content: SITE_TITLE,
+      },
+      {
+        name: "twitter:description",
+        content: SITE_DESCRIPTION,
+      },
+      {
+        name: "twitter:image",
+        content: OG_IMAGE_URL,
       },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "canonical",
+        href: SITE_URL,
       },
       {
         rel: "icon",
