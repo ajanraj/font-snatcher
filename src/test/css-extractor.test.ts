@@ -47,4 +47,28 @@ describe("css font extraction", () => {
       format: "woff2",
     });
   });
+
+  it("captures unicode-range when present", () => {
+    const css = `
+      @font-face {
+        font-family: "Karla";
+        src: url("./KarlaLatin.woff2") format("woff2");
+        font-weight: 200 800;
+        font-style: normal;
+        unicode-range: U+??, U+100-2BA;
+      }
+    `;
+
+    const parsed = parseCssForFonts(css, "https://example.com/assets/site.css");
+
+    expect(parsed.extractedFonts).toHaveLength(1);
+    expect(parsed.extractedFonts[0]).toMatchObject({
+      family: "Karla",
+      style: "normal",
+      weight: "200 800",
+      format: "woff2",
+      sourceUrl: "https://example.com/assets/KarlaLatin.woff2",
+      unicodeRange: "U+??, U+100-2BA",
+    });
+  });
 });

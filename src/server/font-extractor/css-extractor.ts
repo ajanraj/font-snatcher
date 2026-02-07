@@ -102,6 +102,7 @@ interface FontFaceDeclarations {
   src: string | undefined;
   style: string | undefined;
   weight: string | undefined;
+  unicodeRange: string | undefined;
 }
 
 function extractFontFaceViaRegex(cssText: string): FontFaceDeclarations[] {
@@ -124,6 +125,7 @@ function extractFontFaceViaRegex(cssText: string): FontFaceDeclarations[] {
       src: getProperty("src"),
       style: getProperty("font-style"),
       weight: getProperty("font-weight"),
+      unicodeRange: getProperty("unicode-range"),
     });
   }
 
@@ -161,6 +163,7 @@ export function parseCssForFonts(cssText: string, stylesheetUrl: string): Parsed
 
     const style = parseStyleValue(getDeclarationValue(rule.declarations, "font-style"));
     const weight = parseWeightValue(getDeclarationValue(rule.declarations, "font-weight"));
+    const unicodeRange = getDeclarationValue(rule.declarations, "unicode-range");
     const family = normalizeFamilyName(familyValue);
 
     const parsedSources = fontSourcesFromValue(srcValue);
@@ -180,6 +183,7 @@ export function parseCssForFonts(cssText: string, stylesheetUrl: string): Parsed
         weight,
         sourceUrl: resolvedUrl,
         format: sanitizeFormat(detectFontFormat(resolvedUrl, source.format)),
+        unicodeRange,
       });
     }
   }
@@ -195,6 +199,7 @@ export function parseCssForFonts(cssText: string, stylesheetUrl: string): Parsed
 
       const style = parseStyleValue(ff.style);
       const weight = parseWeightValue(ff.weight);
+      const unicodeRange = ff.unicodeRange;
       const family = normalizeFamilyName(ff.family);
 
       const parsedSources = fontSourcesFromValue(ff.src);
@@ -214,6 +219,7 @@ export function parseCssForFonts(cssText: string, stylesheetUrl: string): Parsed
           weight,
           sourceUrl: resolvedUrl,
           format: sanitizeFormat(detectFontFormat(resolvedUrl, source.format)),
+          unicodeRange,
         });
       }
     }

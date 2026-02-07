@@ -1,6 +1,7 @@
 import { load } from "cheerio";
 import {
   EXTRACTION_TIMEOUT_MS,
+  FONT_PREVIEW_TEXT,
   MAX_CSS_BYTES,
   MAX_HTML_BYTES,
   MAX_IMPORT_DEPTH,
@@ -166,7 +167,10 @@ function inferFamilyFromUrl(fontUrl: string): string {
 
     // Remove common suffixes like -Regular, -Bold, etc.
     const cleaned = nameWithoutExt
-      .replace(/[-_](regular|bold|italic|light|medium|semibold|thin|black|variable|wght|ital)/gi, "")
+      .replace(
+        /[-_](regular|bold|italic|light|medium|semibold|thin|black|variable|wght|ital)/gi,
+        "",
+      )
       .replace(/[-_]\d+/g, ""); // Remove weight numbers
 
     // Convert kebab/snake case to title case
@@ -196,6 +200,117 @@ function collectInlineStyles(html: string): string[] {
   return styles;
 }
 
+interface UnicodeInterval {
+  start: number;
+  end: number;
+}
+
+interface UnicodeCoverage {
+  previewCoverage: number;
+  basicLatinCoverage: number;
+}
+
+const PREVIEW_TEXT_CODE_POINTS = Array.from(
+  new Set(
+    Array.from(FONT_PREVIEW_TEXT)
+      .map((char) => char.codePointAt(0))
+      .filter((value): value is number => typeof value === "number"),
+  ),
+);
+
+function parseUnicodeRangeToken(rawToken: string): UnicodeInterval | null {
+  const token = rawToken.trim().toUpperCase();
+  if (!token.startsWith("U+")) {
+    return null;
+  }
+
+  const value = token.slice(2);
+  if (value.length === 0) {
+    return null;
+  }
+
+  const rangeParts = value.split("-");
+  if (rangeParts.length === 2) {
+    const startPart = rangeParts[0]?.trim() ?? "";
+    const endPart = rangeParts[1]?.trim() ?? "";
+    if (!/^[0-9A-F]{1,6}$/.test(startPart) || !/^[0-9A-F]{1,6}$/.test(endPart)) {
+      return null;
+    }
+
+    const start = Number.parseInt(startPart, 16);
+    const end = Number.parseInt(endPart, 16);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || start > end) {
+      return null;
+    }
+
+    return { start, end };
+  }
+
+  if (rangeParts.length !== 1) {
+    return null;
+  }
+
+  const scalarPart = rangeParts[0]?.trim() ?? "";
+  if (!/^[0-9A-F?]{1,6}$/.test(scalarPart)) {
+    return null;
+  }
+
+  if (scalarPart.includes("?")) {
+    const start = Number.parseInt(scalarPart.replace(/\?/g, "0"), 16);
+    const end = Number.parseInt(scalarPart.replace(/\?/g, "F"), 16);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || start > end) {
+      return null;
+    }
+
+    return { start, end };
+  }
+
+  const scalar = Number.parseInt(scalarPart, 16);
+  if (!Number.isFinite(scalar)) {
+    return null;
+  }
+
+  return { start: scalar, end: scalar };
+}
+
+function parseUnicodeRangeList(unicodeRange: string | undefined): UnicodeInterval[] {
+  if (!unicodeRange) {
+    return [];
+  }
+
+  return unicodeRange
+    .split(",")
+    .map((token) => parseUnicodeRangeToken(token))
+    .filter((value): value is UnicodeInterval => value !== null);
+}
+
+function intervalsContainCodePoint(intervals: UnicodeInterval[], codePoint: number): boolean {
+  return intervals.some((interval) => codePoint >= interval.start && codePoint <= interval.end);
+}
+
+function intervalsOverlapBasicLatin(intervals: UnicodeInterval[]): number {
+  return intervals.some((interval) => interval.start <= 0xff && interval.end >= 0x00) ? 1 : 0;
+}
+
+function calculateUnicodeCoverage(unicodeRange: string | undefined): UnicodeCoverage {
+  const intervals = parseUnicodeRangeList(unicodeRange);
+  if (intervals.length === 0) {
+    return {
+      previewCoverage: 0,
+      basicLatinCoverage: 0,
+    };
+  }
+
+  const previewCoverage = PREVIEW_TEXT_CODE_POINTS.reduce((count, codePoint) => {
+    return count + (intervalsContainCodePoint(intervals, codePoint) ? 1 : 0);
+  }, 0);
+
+  return {
+    previewCoverage,
+    basicLatinCoverage: intervalsOverlapBasicLatin(intervals),
+  };
+}
+
 function deduplicateFonts(fonts: ExtractedFontSource[]): ExtractedFontSource[] {
   const formatPriority: Record<ExtractedFontSource["format"], number> = {
     woff2: 0,
@@ -208,6 +323,7 @@ function deduplicateFonts(fonts: ExtractedFontSource[]): ExtractedFontSource[] {
   };
 
   const byVariant = new Map<string, ExtractedFontSource>();
+  const coverageBySource = new Map<string, UnicodeCoverage>();
 
   const normalizeFamilyKey = (value: string): string =>
     value
@@ -266,11 +382,44 @@ function deduplicateFonts(fonts: ExtractedFontSource[]): ExtractedFontSource[] {
     }
   };
 
+  const getCoverage = (font: ExtractedFontSource): UnicodeCoverage => {
+    const cacheKey = `${font.sourceUrl}::${font.unicodeRange ?? ""}`;
+    const cached = coverageBySource.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const computed = calculateUnicodeCoverage(font.unicodeRange);
+    coverageBySource.set(cacheKey, computed);
+    return computed;
+  };
+
   for (const font of fonts) {
     const key = `${normalizeFamilyKey(font.family)}::${font.style}::${normalizeWeightKey(font.weight)}`;
     const existing = byVariant.get(key);
     if (!existing) {
       byVariant.set(key, font);
+      continue;
+    }
+
+    const existingCoverage = getCoverage(existing);
+    const incomingCoverage = getCoverage(font);
+
+    if (incomingCoverage.previewCoverage > existingCoverage.previewCoverage) {
+      byVariant.set(key, font);
+      continue;
+    }
+
+    if (incomingCoverage.previewCoverage < existingCoverage.previewCoverage) {
+      continue;
+    }
+
+    if (incomingCoverage.basicLatinCoverage > existingCoverage.basicLatinCoverage) {
+      byVariant.set(key, font);
+      continue;
+    }
+
+    if (incomingCoverage.basicLatinCoverage < existingCoverage.basicLatinCoverage) {
       continue;
     }
 

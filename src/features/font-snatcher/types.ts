@@ -117,4 +117,5 @@ export interface ExtractedFontSource {
   weight: number | string | null;
   format: FontFormat;
   sourceUrl: string;
+  unicodeRange?: string;
 }
