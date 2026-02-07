@@ -97,6 +97,39 @@ function sanitizeFormat(format: FontFormat): FontFormat {
   return format;
 }
 
+interface FontFaceDeclarations {
+  family: string | undefined;
+  src: string | undefined;
+  style: string | undefined;
+  weight: string | undefined;
+}
+
+function extractFontFaceViaRegex(cssText: string): FontFaceDeclarations[] {
+  const results: FontFaceDeclarations[] = [];
+  const fontFaceRegex = /@font-face\s*\{([^}]+)\}/gi;
+
+  let match: RegExpExecArray | null;
+  while ((match = fontFaceRegex.exec(cssText)) !== null) {
+    const block = match[1];
+    if (!block) continue;
+
+    const getProperty = (prop: string): string | undefined => {
+      const propRegex = new RegExp(`${prop}\\s*:\\s*([^;]+)`, "i");
+      const propMatch = block.match(propRegex);
+      return propMatch?.[1]?.trim();
+    };
+
+    results.push({
+      family: getProperty("font-family"),
+      src: getProperty("src"),
+      style: getProperty("font-style"),
+      weight: getProperty("font-weight"),
+    });
+  }
+
+  return results;
+}
+
 export function parseCssForFonts(cssText: string, stylesheetUrl: string): ParsedCssResult {
   const ast = parseCss(cssText, { silent: true, source: stylesheetUrl });
   const rootRules = ast.stylesheet.rules;
@@ -148,6 +181,41 @@ export function parseCssForFonts(cssText: string, stylesheetUrl: string): Parsed
         sourceUrl: resolvedUrl,
         format: sanitizeFormat(detectFontFormat(resolvedUrl, source.format)),
       });
+    }
+  }
+
+  // Fallback: if AST parser found no fonts, try regex extraction
+  // This handles modern CSS (e.g. @custom-variant) that breaks the parser
+  if (extractedFonts.length === 0) {
+    const regexFonts = extractFontFaceViaRegex(cssText);
+    for (const ff of regexFonts) {
+      if (!ff.family || !ff.src) {
+        continue;
+      }
+
+      const style = parseStyleValue(ff.style);
+      const weight = parseWeightValue(ff.weight);
+      const family = normalizeFamilyName(ff.family);
+
+      const parsedSources = fontSourcesFromValue(ff.src);
+      for (const source of parsedSources) {
+        if (!source.url) {
+          continue;
+        }
+
+        const resolvedUrl = resolveFontFaceUrl(source.url, stylesheetUrl);
+        if (!resolvedUrl) {
+          continue;
+        }
+
+        extractedFonts.push({
+          family,
+          style,
+          weight,
+          sourceUrl: resolvedUrl,
+          format: sanitizeFormat(detectFontFormat(resolvedUrl, source.format)),
+        });
+      }
     }
   }
 
