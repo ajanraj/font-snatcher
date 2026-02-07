@@ -135,7 +135,9 @@ export function FontCard({
             </div>
           ) : null}
           {!alternativesLoading && alternatives.length === 0 ? (
-            <p className="text-xs text-emerald-700 dark:text-emerald-400">No alternatives found yet.</p>
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">
+              No alternatives found yet.
+            </p>
           ) : null}
           <ul className="grid gap-2">
             {alternatives.map((alternative, index) => (
@@ -158,7 +160,10 @@ export function FontCard({
                     <span className="text-xs font-semibold text-emerald-700 tabular-nums dark:text-emerald-400">
                       {alternative.similarity}%
                     </span>
-                    <ArrowSquareOut weight="bold" className="h-3.5 w-3.5 text-muted-foreground/70" />
+                    <ArrowSquareOut
+                      weight="bold"
+                      className="h-3.5 w-3.5 text-muted-foreground/70"
+                    />
                   </div>
                 </a>
               </li>

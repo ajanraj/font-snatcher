@@ -580,7 +580,8 @@ export function FontSnatcherPage() {
               <div className="space-y-2 text-xs leading-relaxed text-muted-foreground">
                 <p>
                   This tool inspects publicly served font assets for research and testing. It reads
-                  what your browser already receives. No protection bypassed, no private files accessed.
+                  what your browser already receives. No protection bypassed, no private files
+                  accessed.
                 </p>
                 <p>
                   Fonts are often licensed. Downloading doesn't grant usage rights.{" "}
@@ -604,8 +605,7 @@ export function FontSnatcherPage() {
                 Ajan Raj
               </a>
               . Open source{" "}
-              <Heart className="inline-block h-3 w-3 align-[-1px] text-muted-foreground/70" />{" "}
-              on{" "}
+              <Heart className="inline-block h-3 w-3 align-[-1px] text-muted-foreground/70" /> on{" "}
               <a
                 href="https://github.com/ajanraj/font-snatcher"
                 target="_blank"
