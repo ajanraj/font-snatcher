@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { MagnifyingGlass, SpinnerGap, Warning, X } from "@phosphor-icons/react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +22,28 @@ import type {
   MatchApiResponse,
 } from "@/features/font-snatcher/types";
 
-const EXAMPLE_URLS = ["stripe.com", "linear.app", "vercel.com"];
+const EXAMPLE_URLS = [
+  // Set 1
+  "stripe.com",
+  "linear.app",
+  "vercel.com",
+  // Set 2
+  "ampcode.com",
+  "figma.com",
+  "github.com",
+  // Set 3
+  "spotify.com",
+  "airbnb.com",
+  "claude.ai",
+  // Set 4
+  "openai.com",
+  "every.to",
+  "raycast.com",
+  // Set 5
+  "arc.net",
+  "framer.com",
+  "supabase.com",
+];
 
 interface ExtractState {
   isLoading: boolean;
@@ -192,8 +215,30 @@ export function FontSnatcherPage() {
   >({});
   const [alternativesLoadingIds, setAlternativesLoadingIds] = useState<Set<string>>(new Set());
   const [pendingPaidDownload, setPendingPaidDownload] = useState<FontCardModel | null>(null);
+  const [exampleIndex, setExampleIndex] = useState(0);
   const extractRequestIdRef = useRef(0);
   const extractAbortControllerRef = useRef<AbortController | null>(null);
+
+  const hasResults = extractState.data !== null;
+
+  // Cycle through example sets every 3s when no results
+  useEffect(() => {
+    if (hasResults) return;
+    const interval = setInterval(() => {
+      setExampleIndex((prev) => {
+        const nextSet = Math.floor(prev / 3) + 1;
+        const totalSets = Math.floor(EXAMPLE_URLS.length / 3);
+        return (nextSet % totalSets) * 3;
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [hasResults]);
+
+  const visibleExamples = [
+    EXAMPLE_URLS[exampleIndex],
+    EXAMPLE_URLS[exampleIndex + 1],
+    EXAMPLE_URLS[exampleIndex + 2],
+  ];
 
   const fonts = useMemo<FontCardModel[]>(() => {
     if (!extractState.data) {
@@ -327,21 +372,29 @@ export function FontSnatcherPage() {
         <div className="dot-grid-bg h-full w-full" />
       </div>
 
-      <section className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-16 pt-14 sm:px-6 lg:px-10">
+      <section
+        className={`relative mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-16 sm:px-6 lg:px-10 ${
+          hasResults ? "pt-10" : "pt-[20vh]"
+        }`}
+      >
         <header className="mx-auto max-w-3xl text-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Font Discovery Tool</p>
-          <h1 className="mt-4 font-display text-balance text-5xl leading-[0.95] text-[#0f1b3d] sm:text-6xl">
+          <p className="animate-fade-in-up text-xs uppercase tracking-[0.2em] text-slate-500">
+            Font Discovery Tool
+          </p>
+          <h1 className="animate-fade-in-up-delay-1 mt-4 font-display text-balance text-5xl leading-[0.95] text-[#0f1b3d] sm:text-6xl">
             Discover Any Web Font
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-pretty text-base text-slate-600 sm:text-lg">
-            Enter any website URL to discover fonts, preview them live, download originals, and find
-            free legal alternatives.
-          </p>
+          {!hasResults && (
+            <p className="animate-fade-in-up-delay-2 mx-auto mt-5 max-w-2xl text-pretty text-base text-slate-600 sm:text-lg">
+              Enter any website URL to discover fonts, preview them live, download originals, and
+              find free legal alternatives.
+            </p>
+          )}
         </header>
 
         <form
           onSubmit={onExtract}
-          className="mx-auto w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-1.5 shadow-md"
+          className="animate-fade-in-up-delay-2 mx-auto w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-1.5 shadow-md transition-shadow duration-150 ease-out hover:shadow-lg"
         >
           <div className="relative">
             <Input
@@ -354,62 +407,121 @@ export function FontSnatcherPage() {
             />
             <Button
               type="submit"
-              className="absolute right-1.5 top-1.5 h-9 rounded-lg bg-[#0f1b3d] px-5 text-white hover:bg-[#182a5c]"
+              className="absolute right-1.5 top-1.5 h-9 gap-2 rounded-lg bg-[#0f1b3d] px-5 text-white transition-transform duration-75 ease-out active:scale-[0.97] hover:bg-[#182a5c]"
               disabled={extractState.isLoading}
               aria-label="Extract fonts from website"
             >
-              {extractState.isLoading ? "Extracting..." : "Extract"}
+              {extractState.isLoading ? (
+                <>
+                  <SpinnerGap className="h-4 w-4 animate-spin" />
+                  Extracting
+                </>
+              ) : (
+                <>
+                  <MagnifyingGlass weight="bold" className="h-4 w-4" />
+                  Extract
+                </>
+              )}
             </Button>
           </div>
         </form>
-        <div className="mx-auto -mt-5 flex w-full max-w-xl flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
-          <span>Try</span>
-          {EXAMPLE_URLS.map((example) => (
-            <button
-              key={example}
-              type="button"
-              className="underline underline-offset-2 hover:text-slate-700"
-              onClick={() => setTargetUrl(example)}
-            >
-              {example}
-            </button>
-          ))}
-        </div>
 
-        {extractState.error ? (
-          <div
-            role="alert"
-            aria-live="assertive"
-            className="mx-auto w-full max-w-3xl rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
-          >
-            {extractState.error}
+        {!hasResults && (
+          <div className="animate-fade-in-up-delay-2 mx-auto -mt-5 text-xs text-slate-500">
+            <div className="flex items-center justify-center">
+              <span className="mr-1.5">Try</span>
+              <div className="relative h-5 w-[240px]">
+                <AnimatePresence mode="popLayout">
+                  <motion.div
+                    key={`set-${exampleIndex}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+                    className="absolute inset-0 flex items-center gap-2"
+                  >
+                    {visibleExamples.map((example) => (
+                      <button
+                        key={example}
+                        type="button"
+                        className="whitespace-nowrap underline underline-offset-2 transition-colors duration-100 hover:text-slate-700"
+                        onClick={() => setTargetUrl(example)}
+                      >
+                        {example}
+                      </button>
+                    ))}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
           </div>
-        ) : null}
+        )}
 
-        {extractState.data ? (
-          <section className="space-y-5">
+        <AnimatePresence>
+          {extractState.error ? (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              role="alert"
+              aria-live="assertive"
+              className="mx-auto flex w-full max-w-3xl items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+            >
+              <Warning weight="fill" className="h-5 w-5 shrink-0" />
+              {extractState.error}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+
+        {extractState.data && (
+          <section className="animate-fade-in-up space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm font-medium uppercase tracking-wide text-slate-600">
-                Found {extractState.data.totalFound} fonts
-              </p>
+              <div className="flex items-center gap-3">
+                <p className="text-sm font-medium uppercase tracking-wide text-slate-600">
+                  Found {extractState.data.totalFound} fonts
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setExtractState({ isLoading: false, error: null, data: null });
+                    setTargetUrl("");
+                    setAlternativesOpenIds(new Set());
+                    setAlternativesByFontId({});
+                  }}
+                  className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-slate-500 transition-colors duration-100 ease-out hover:bg-slate-100 hover:text-slate-700"
+                  aria-label="Clear results"
+                >
+                  <X weight="bold" className="h-3 w-3" />
+                  Clear
+                </button>
+              </div>
               <p className="text-xs text-slate-500">{extractState.data.sourceUrl}</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {fonts.map((font) => (
-                <FontCard
+              {fonts.map((font, index) => (
+                <div
                   key={font.id}
-                  font={font}
-                  alternatives={alternativesByFontId[font.id] ?? []}
-                  alternativesOpen={alternativesOpenIds.has(font.id)}
-                  alternativesLoading={alternativesLoadingIds.has(font.id)}
-                  onToggleAlternatives={onToggleAlternatives}
-                  onRequestDownload={onRequestDownload}
-                />
+                  className="animate-fade-in-up"
+                  style={{
+                    animationDelay: `${Math.min(index * 40, 200)}ms`,
+                  }}
+                >
+                  <FontCard
+                    font={font}
+                    alternatives={alternativesByFontId[font.id] ?? []}
+                    alternativesOpen={alternativesOpenIds.has(font.id)}
+                    alternativesLoading={alternativesLoadingIds.has(font.id)}
+                    onToggleAlternatives={onToggleAlternatives}
+                    onRequestDownload={onRequestDownload}
+                  />
+                </div>
               ))}
             </div>
           </section>
-        ) : null}
+        )}
       </section>
 
       <AlertDialog
