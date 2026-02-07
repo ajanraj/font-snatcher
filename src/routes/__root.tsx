@@ -61,6 +61,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          defer
+          src="https://umami.ajanraj.com/script.js"
+          data-website-id="a0d86aeb-f338-47f5-bf5e-0e0aa5c8739f"
+        ></script>
       </head>
       <body>
         {children}
