@@ -66,7 +66,36 @@ function parseErrorMessage(value: unknown): string | null {
 
 function normalizeWeightLabel(weight: string): string {
   const trimmed = weight.trim();
-  return trimmed.length > 0 ? trimmed : "400";
+  if (trimmed.length === 0) {
+    return "400";
+  }
+
+  const lower = trimmed.toLowerCase();
+  if (lower === "normal") {
+    return "400";
+  }
+  if (lower === "bold") {
+    return "700";
+  }
+
+  const numericPieces = trimmed
+    .split(/\s+/u)
+    .map((part) => Number.parseInt(part, 10))
+    .filter((part) => Number.isFinite(part));
+
+  if (numericPieces.length === 0) {
+    return trimmed;
+  }
+
+  const clampWeight = (value: number): number => Math.min(900, Math.max(100, value));
+
+  if (numericPieces.length === 1) {
+    return String(clampWeight(numericPieces[0]));
+  }
+
+  const minimum = clampWeight(Math.min(...numericPieces));
+  const maximum = clampWeight(Math.max(...numericPieces));
+  return minimum === maximum ? String(minimum) : `${minimum} ${maximum}`;
 }
 
 function openDownload(downloadUrl: string): void {

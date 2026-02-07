@@ -84,6 +84,74 @@ describe("FontSnatcherPage", () => {
     expect(input.value).toBe("");
   });
 
+  it("normalizes variable weight ranges for display", async () => {
+    vi.mocked(fetch).mockImplementation(async (input) => {
+      const url = resolveRequestUrl(input);
+
+      if (url.includes("/api/extract")) {
+        return jsonResponse({
+          fonts: [
+            {
+              name: "GeistVariable.woff2",
+              family: "Geist",
+              format: "WOFF2",
+              url: "https://cdn.example.com/geist-variable.woff2",
+              weight: "1 1000",
+              style: "normal",
+              referer: "https://example.com/",
+              previewUrl: "/api/font?preview=weight-range",
+              downloadUrl: "/api/font?download=weight-range",
+              licenseStatus: "unknown_or_paid",
+              licenseNote: "This font might not be free to use.",
+            },
+          ],
+          totalFound: 1,
+          sourceUrl: "https://example.com/",
+        });
+      }
+
+      if (url.includes("/api/font?preview=weight-range")) {
+        return fontBinaryResponse();
+      }
+
+      if (url.includes("/api/match")) {
+        return jsonResponse({
+          original: { family: "Geist", weight: "1 1000", style: "normal" },
+          method: "feature-similarity",
+          features: {
+            weightClass: 0.44,
+            widthClass: 0.5,
+            xHeightRatio: 0.54,
+            capHeightRatio: 0.72,
+            ascenderRatio: 0.96,
+            descenderRatio: 0.24,
+            avgWidthRatio: 0.64,
+            serifScore: 0.21,
+            contrastRatio: 0.11,
+            roundness: 0.57,
+            isMonospace: 0,
+            italicAngle: 0,
+            panoseSerif: 0,
+            panoseWeight: 0.44,
+            complexity: 0.38,
+          },
+          alternatives: [],
+        });
+      }
+
+      return jsonResponse({ error: "Unhandled request" }, 500);
+    });
+
+    render(<FontSnatcherPage />);
+
+    submitExtractWithUrl("example.com");
+
+    await waitFor(() => {
+      expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
+      expect(screen.queryByText("Weight 100 900")).not.toBeNull();
+    });
+  });
+
   it("shows paid warning modal before download", async () => {
     vi.mocked(fetch).mockImplementation(async (input) => {
       const url = resolveRequestUrl(input);
