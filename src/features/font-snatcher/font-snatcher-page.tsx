@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { MagnifyingGlass, SpinnerGap, Warning, X } from "@phosphor-icons/react";
+import {
+  ArrowSquareOut,
+  Heart,
+  MagnifyingGlass,
+  SpinnerGap,
+  Warning,
+  X,
+} from "@phosphor-icons/react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -367,13 +374,13 @@ export function FontSnatcherPage() {
   };
 
   return (
-    <main className="relative min-h-dvh bg-white text-slate-900">
+    <main className="relative flex min-h-dvh flex-col bg-white text-slate-900">
       <div className="pointer-events-none absolute inset-0 opacity-35" aria-hidden>
         <div className="dot-grid-bg h-full w-full" />
       </div>
 
       <section
-        className={`relative mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-16 sm:px-6 lg:px-10 ${
+        className={`relative mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 pb-16 sm:px-6 lg:px-10 ${
           hasResults ? "pt-10" : "pt-[20vh]"
         }`}
       >
@@ -546,6 +553,89 @@ export function FontSnatcherPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <footer className="relative mt-auto border-t border-slate-100 bg-slate-50/50 px-4 py-10 sm:px-6 lg:px-10">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-3">
+              <h4 className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Supported Formats
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {["WOFF2", "WOFF", "TTF", "OTF"].map((format) => (
+                  <span
+                    key={format}
+                    className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700"
+                  >
+                    {format}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3 lg:col-span-2">
+              <h4 className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Usage Guidelines
+              </h4>
+              <div className="space-y-2 text-xs leading-relaxed text-slate-600">
+                <p>
+                  This tool inspects publicly served font assets for research and testing. It reads
+                  what your browser already receives. No protection bypassed, no private files accessed.
+                </p>
+                <p>
+                  Fonts are often licensed. Downloading doesn't grant usage rights.{" "}
+                  <span className="font-medium text-slate-700">
+                    Verify your license before using any font in production.
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
+            <p className="text-xs text-slate-500">
+              © 2026{" "}
+              <a
+                href="https://ajanraj.com?utm_source=font-snatcher&utm_medium=footer&utm_campaign=projects"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-slate-700 underline-offset-2 transition-colors duration-100 hover:underline"
+              >
+                Ajan Raj
+              </a>
+              . Open source{" "}
+              <Heart className="inline-block h-3 w-3 align-[-1px] text-slate-400" />{" "}
+              on{" "}
+              <a
+                href="https://github.com/ajanraj/font-snatcher"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-slate-700 underline-offset-2 transition-colors duration-100 hover:underline"
+              >
+                GitHub
+              </a>
+              .
+            </p>
+            <a
+              href="https://oschat.ai?utm_source=font-snatcher&utm_medium=footer&utm_campaign=projects"
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center gap-1.5 text-xs text-slate-500 transition-colors duration-100 hover:text-slate-700"
+            >
+              <span>
+                Also check out{" "}
+                <span className="font-medium text-slate-700 underline-offset-2 group-hover:underline">
+                  OS Chat
+                </span>
+                , open-source AI assistant with 50+ models
+              </span>
+              <ArrowSquareOut
+                weight="bold"
+                className="h-3 w-3 shrink-0 opacity-50 transition-opacity group-hover:opacity-100"
+              />
+            </a>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
