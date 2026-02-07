@@ -3,6 +3,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
+import { createThemeInitScript } from "../lib/theme";
 
 import appCss from "../styles.css?url";
 
@@ -11,6 +12,8 @@ import type { QueryClient } from "@tanstack/react-query";
 interface MyRouterContext {
   queryClient: QueryClient;
 }
+
+const themeInitScript = createThemeInitScript();
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -23,6 +26,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
+        name: "color-scheme",
+        content: "dark light",
+      },
+      {
         title: "Font Snatcher",
       },
     ],
@@ -30,6 +37,23 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/favicon.svg?v=20260207-2",
+      },
+      {
+        rel: "shortcut icon",
+        href: "/favicon.ico?v=20260207-2",
+      },
+      {
+        rel: "apple-touch-icon",
+        href: "/logo192.png?v=20260207-2",
+      },
+      {
+        rel: "manifest",
+        href: "/manifest.json?v=20260207-2",
       },
     ],
   }),
@@ -57,15 +81,20 @@ function RootNotFound() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const isProduction = import.meta.env.PROD;
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }}></script>
         <HeadContent />
-        <script
-          defer
-          src="https://umami.ajanraj.com/script.js"
-          data-website-id="a0d86aeb-f338-47f5-bf5e-0e0aa5c8739f"
-        ></script>
+        {isProduction ? (
+          <script
+            defer
+            src="https://umami.ajanraj.com/script.js"
+            data-website-id="a0d86aeb-f338-47f5-bf5e-0e0aa5c8739f"
+          ></script>
+        ) : null}
       </head>
       <body>
         {children}

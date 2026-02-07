@@ -1,55 +1,21 @@
 import { useEffect, useState } from "react";
+import { applyThemeToRoot, getPreferredTheme, persistTheme, type Theme } from "../lib/theme";
 
-type Theme = "light" | "dark";
-
-const STORAGE_KEY = "theme";
-const DARK_CLASS = "dark";
-
-function getThemeStorage(): Pick<Storage, "getItem" | "setItem"> | null {
+function getInitialTheme(): Theme {
   if (typeof window === "undefined") {
-    return null;
-  }
-
-  try {
-    const storage = window.localStorage;
-    if (typeof storage?.getItem === "function" && typeof storage?.setItem === "function") {
-      return storage;
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-}
-
-function getStoredTheme(): Theme {
-  const storage = getThemeStorage();
-  if (!storage) {
     return "light";
   }
 
-  const stored = storage.getItem(STORAGE_KEY);
-  if (stored === "light" || stored === "dark") {
-    return stored;
-  }
-  return "light";
-}
-
-function applyTheme(theme: Theme): void {
-  const root = document.documentElement;
-  if (theme === "dark") {
-    root.classList.add(DARK_CLASS);
-  } else {
-    root.classList.remove(DARK_CLASS);
-  }
+  return getPreferredTheme(window);
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(getStoredTheme);
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
   const setTheme = (newTheme: Theme) => {
-    const storage = getThemeStorage();
-    storage?.setItem(STORAGE_KEY, newTheme);
+    if (typeof window !== "undefined") {
+      persistTheme(window, newTheme);
+    }
     setThemeState(newTheme);
   };
 
@@ -58,7 +24,7 @@ export function useTheme() {
   };
 
   useEffect(() => {
-    applyTheme(theme);
+    applyThemeToRoot(document.documentElement, theme);
   }, [theme]);
 
   return { theme, setTheme, toggleTheme } as const;

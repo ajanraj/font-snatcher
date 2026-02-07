@@ -1,12 +1,5 @@
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
 import type { GoogleFontCatalogEntry } from "@/features/font-snatcher/types";
-
-const SNAPSHOT_FILE_PATH = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../data/google-fonts.snapshot.json",
-);
+import snapshotRaw from "@/data/google-fonts.snapshot.json";
 
 let cachedSnapshot: GoogleFontCatalogEntry[] | null = null;
 
@@ -43,8 +36,7 @@ export async function getGoogleFontsSnapshot(): Promise<GoogleFontCatalogEntry[]
     return cachedSnapshot;
   }
 
-  const raw = await readFile(SNAPSHOT_FILE_PATH, "utf8");
-  const parsed: unknown = JSON.parse(raw);
+  const parsed: unknown = snapshotRaw;
 
   if (!Array.isArray(parsed)) {
     throw new Error("Invalid Google Fonts snapshot format.");
