@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CircleNotch, WarningCircle } from "@phosphor-icons/react";
 import type { FontStyle } from "@/features/font-snatcher/types";
 
 interface PreviewableFont {
@@ -110,17 +111,28 @@ export function FontPreview({ font, text }: FontPreviewProps) {
       : { fontFamily: "var(--font-body)" };
 
   return (
-    <div className="rounded-xl border border-white/65 bg-white/80 p-4 shadow-sm">
-      <p className="text-3xl leading-[1.35] text-balance text-slate-950" style={previewStyle}>
+    <div className="relative overflow-hidden rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+      <p
+        className={`text-2xl leading-[1.4] text-balance text-slate-950 transition-opacity duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] ${
+          status === "loaded" ? "opacity-100" : "opacity-40"
+        }`}
+        style={previewStyle}
+      >
         {text}
       </p>
       {status === "loading" ? (
-        <p className="mt-3 text-[11px] text-slate-500">Loading live preview...</p>
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-50/80">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <CircleNotch weight="bold" className="h-3.5 w-3.5 animate-spin" />
+            Loading preview
+          </div>
+        </div>
       ) : null}
       {status === "failed" ? (
-        <p className="mt-3 text-[11px] text-amber-700">
-          Preview unavailable. Download may still work.
-        </p>
+        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-amber-700">
+          <WarningCircle weight="fill" className="h-3.5 w-3.5" />
+          Preview unavailable
+        </div>
       ) : null}
     </div>
   );
