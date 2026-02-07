@@ -203,7 +203,10 @@ function isDnsJsonResponse(value: unknown): value is DnsJsonResponse {
   return answer === undefined || Array.isArray(answer);
 }
 
-async function resolveViaDnsOverHttps(hostname: string, recordType: "A" | "AAAA"): Promise<string[]> {
+async function resolveViaDnsOverHttps(
+  hostname: string,
+  recordType: "A" | "AAAA",
+): Promise<string[]> {
   const endpoint = new URL("https://cloudflare-dns.com/dns-query");
   endpoint.searchParams.set("name", hostname);
   endpoint.searchParams.set("type", recordType);
