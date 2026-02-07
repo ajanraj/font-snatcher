@@ -157,3 +157,56 @@ code {
   background-image: radial-gradient(circle at center, rgb(100 116 139 / 0.2) 1px, transparent 1px);
   background-size: 16px 16px;
 }
+
+/* Easing curves */
+:root {
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* GPU-accelerated animation utilities */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Fade in animation - CSS only, off main thread */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 250ms var(--ease-out-quart) both;
+}
+
+.animate-fade-in-up-delay-1 {
+  animation: fade-in-up 250ms var(--ease-out-quart) 50ms both;
+}
+
+.animate-fade-in-up-delay-2 {
+  animation: fade-in-up 250ms var(--ease-out-quart) 100ms both;
+}
+
+/* Stagger delays for cards */
+.stagger-1 { animation-delay: 30ms; }
+.stagger-2 { animation-delay: 60ms; }
+.stagger-3 { animation-delay: 90ms; }
+.stagger-4 { animation-delay: 120ms; }
+.stagger-5 { animation-delay: 150ms; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
