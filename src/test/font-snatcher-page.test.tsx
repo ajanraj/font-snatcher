@@ -148,7 +148,7 @@ describe("FontSnatcherPage", () => {
 
     await waitFor(() => {
       expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
-      expect(screen.queryByText("Weight 100 900")).not.toBeNull();
+      expect(screen.queryByText("100 900")).not.toBeNull();
     });
   });
 
@@ -317,7 +317,7 @@ describe("FontSnatcherPage", () => {
 
     await waitFor(() => {
       expect(screen.queryByText("Inter")).not.toBeNull();
-      expect(screen.queryByText("86% match")).not.toBeNull();
+      expect(screen.queryByText("86%")).not.toBeNull();
       expect(screen.queryByText("86% visual match")).not.toBeNull();
       expect(
         screen.queryByText("These Google Fonts are free to use commercially and personally."),

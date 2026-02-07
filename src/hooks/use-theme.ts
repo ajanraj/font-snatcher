@@ -5,9 +5,30 @@ type Theme = "light" | "dark";
 const STORAGE_KEY = "theme";
 const DARK_CLASS = "dark";
 
+function getThemeStorage(): Pick<Storage, "getItem" | "setItem"> | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const storage = window.localStorage;
+    if (typeof storage?.getItem === "function" && typeof storage?.setItem === "function") {
+      return storage;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "light";
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const storage = getThemeStorage();
+  if (!storage) {
+    return "light";
+  }
+
+  const stored = storage.getItem(STORAGE_KEY);
   if (stored === "light" || stored === "dark") {
     return stored;
   }
@@ -27,7 +48,8 @@ export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
 
   const setTheme = (newTheme: Theme) => {
-    localStorage.setItem(STORAGE_KEY, newTheme);
+    const storage = getThemeStorage();
+    storage?.setItem(STORAGE_KEY, newTheme);
     setThemeState(newTheme);
   };
 
