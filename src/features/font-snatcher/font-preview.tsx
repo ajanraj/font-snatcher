@@ -111,9 +111,9 @@ export function FontPreview({ font, text }: FontPreviewProps) {
       : { fontFamily: "var(--font-body)" };
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+    <div className="relative overflow-hidden rounded-xl border border-border/50 bg-muted/50 p-4">
       <p
-        className={`text-2xl leading-[1.4] text-balance text-slate-950 transition-opacity duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] ${
+        className={`text-2xl leading-[1.4] text-balance text-foreground transition-opacity duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] ${
           status === "loaded" ? "opacity-100" : "opacity-40"
         }`}
         style={previewStyle}
@@ -121,15 +121,15 @@ export function FontPreview({ font, text }: FontPreviewProps) {
         {text}
       </p>
       {status === "loading" ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-50/80">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+        <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <CircleNotch weight="bold" className="h-3.5 w-3.5 animate-spin" />
             Loading preview
           </div>
         </div>
       ) : null}
       {status === "failed" ? (
-        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-amber-700">
+        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-amber-700 dark:text-amber-400">
           <WarningCircle weight="fill" className="h-3.5 w-3.5" />
           Preview unavailable
         </div>
