@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FontCard, type FontCardModel } from "@/features/font-snatcher/font-card";
+import { ThemeToggle } from "@/features/font-snatcher/theme-toggle";
 import type {
   ExtractApiFontEntry,
   ExtractApiResponse,
@@ -374,7 +375,7 @@ export function FontSnatcherPage() {
   };
 
   return (
-    <main className="relative flex min-h-dvh flex-col bg-white text-slate-900">
+    <main className="relative flex min-h-dvh flex-col bg-background text-foreground">
       <div className="pointer-events-none absolute inset-0 opacity-35" aria-hidden>
         <div className="dot-grid-bg h-full w-full" />
       </div>
@@ -385,14 +386,14 @@ export function FontSnatcherPage() {
         }`}
       >
         <header className="mx-auto max-w-3xl text-center">
-          <p className="animate-fade-in-up text-xs uppercase tracking-[0.2em] text-slate-500">
+          <p className="animate-fade-in-up text-sm uppercase tracking-[0.2em] text-muted-foreground">
             Font Discovery Tool
           </p>
-          <h1 className="animate-fade-in-up-delay-1 mt-4 font-display text-balance text-5xl leading-[0.95] text-[#0f1b3d] sm:text-6xl">
+          <h1 className="animate-fade-in-up-delay-1 mt-5 font-display text-balance text-6xl leading-[0.95] text-foreground sm:text-7xl">
             Discover Any Web Font
           </h1>
           {!hasResults && (
-            <p className="animate-fade-in-up-delay-2 mx-auto mt-5 max-w-2xl text-pretty text-base text-slate-600 sm:text-lg">
+            <p className="animate-fade-in-up-delay-2 mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground sm:text-xl">
               Enter any website URL to discover fonts, preview them live, download originals, and
               find free legal alternatives.
             </p>
@@ -401,7 +402,7 @@ export function FontSnatcherPage() {
 
         <form
           onSubmit={onExtract}
-          className="animate-fade-in-up-delay-2 mx-auto w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-1.5 shadow-md transition-shadow duration-150 ease-out hover:shadow-lg"
+          className="animate-fade-in-up-delay-2 mx-auto w-full max-w-2xl rounded-2xl border border-border bg-background p-2 shadow-md transition-shadow duration-150 ease-out hover:shadow-lg"
         >
           <div className="relative">
             <Input
@@ -409,12 +410,12 @@ export function FontSnatcherPage() {
               onChange={(event) => setTargetUrl(event.currentTarget.value)}
               placeholder="Enter website URL"
               aria-label="Website URL"
-              className="h-12 rounded-xl border-0 bg-transparent px-4 pr-32 text-sm shadow-none focus-visible:ring-0"
+              className="h-14 rounded-xl border-0 bg-transparent px-5 pr-36 text-base shadow-none focus-visible:ring-0"
               required
             />
             <Button
               type="submit"
-              className="absolute right-1.5 top-1.5 h-9 gap-2 rounded-lg bg-[#0f1b3d] px-5 text-white transition-transform duration-75 ease-out active:scale-[0.97] hover:bg-[#182a5c]"
+              className="absolute right-2 top-2 h-10 gap-2 rounded-lg bg-primary px-6 text-white transition-transform duration-75 ease-out active:scale-[0.97] hover:bg-primary/90"
               disabled={extractState.isLoading}
               aria-label="Extract fonts from website"
             >
@@ -434,7 +435,7 @@ export function FontSnatcherPage() {
         </form>
 
         {!hasResults && (
-          <div className="animate-fade-in-up-delay-2 mx-auto -mt-5 text-xs text-slate-500">
+          <div className="animate-fade-in-up-delay-2 mx-auto -mt-4 text-sm text-muted-foreground">
             <div className="flex items-center justify-center">
               <span className="mr-1.5">Try</span>
               <div className="relative h-5 w-[240px]">
@@ -451,7 +452,7 @@ export function FontSnatcherPage() {
                       <button
                         key={example}
                         type="button"
-                        className="whitespace-nowrap underline underline-offset-2 transition-colors duration-100 hover:text-slate-700"
+                        className="whitespace-nowrap underline underline-offset-2 transition-colors duration-100 hover:text-accent-foreground"
                         onClick={() => setTargetUrl(example)}
                       >
                         {example}
@@ -474,7 +475,7 @@ export function FontSnatcherPage() {
               transition={{ duration: 0.15, ease: "easeOut" }}
               role="alert"
               aria-live="assertive"
-              className="mx-auto flex w-full max-w-3xl items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+              className="mx-auto flex w-full max-w-3xl items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-950/50 dark:text-rose-400"
             >
               <Warning weight="fill" className="h-5 w-5 shrink-0" />
               {extractState.error}
@@ -486,7 +487,7 @@ export function FontSnatcherPage() {
           <section className="animate-fade-in-up space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <p className="text-sm font-medium uppercase tracking-wide text-slate-600">
+                <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
                   Found {extractState.data.totalFound} fonts
                 </p>
                 <button
@@ -497,14 +498,14 @@ export function FontSnatcherPage() {
                     setAlternativesOpenIds(new Set());
                     setAlternativesByFontId({});
                   }}
-                  className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-slate-500 transition-colors duration-100 ease-out hover:bg-slate-100 hover:text-slate-700"
+                  className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors duration-100 ease-out hover:bg-accent hover:text-accent-foreground"
                   aria-label="Clear results"
                 >
                   <X weight="bold" className="h-3 w-3" />
                   Clear
                 </button>
               </div>
-              <p className="text-xs text-slate-500">{extractState.data.sourceUrl}</p>
+              <p className="text-xs text-muted-foreground">{extractState.data.sourceUrl}</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -553,18 +554,18 @@ export function FontSnatcherPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <footer className="relative mt-auto border-t border-slate-100 bg-slate-50/50 px-4 py-10 sm:px-6 lg:px-10">
+      <footer className="relative mt-auto border-t border-border/50 bg-muted/50 px-4 py-10 sm:px-6 lg:px-10">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-3">
-              <h4 className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Supported Formats
               </h4>
               <div className="flex flex-wrap gap-2">
                 {["WOFF2", "WOFF", "TTF", "OTF"].map((format) => (
                   <span
                     key={format}
-                    className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700"
+                    className="rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground/80"
                   >
                     {format}
                   </span>
@@ -573,17 +574,17 @@ export function FontSnatcherPage() {
             </div>
 
             <div className="space-y-3 lg:col-span-2">
-              <h4 className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Usage Guidelines
               </h4>
-              <div className="space-y-2 text-xs leading-relaxed text-slate-600">
+              <div className="space-y-2 text-xs leading-relaxed text-muted-foreground">
                 <p>
                   This tool inspects publicly served font assets for research and testing. It reads
                   what your browser already receives. No protection bypassed, no private files accessed.
                 </p>
                 <p>
                   Fonts are often licensed. Downloading doesn't grant usage rights.{" "}
-                  <span className="font-medium text-slate-700">
+                  <span className="font-medium text-foreground/80">
                     Verify your license before using any font in production.
                   </span>
                 </p>
@@ -591,48 +592,51 @@ export function FontSnatcherPage() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
-            <p className="text-xs text-slate-500">
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
+            <p className="text-xs text-muted-foreground">
               © 2026{" "}
               <a
                 href="https://ajanraj.com?utm_source=font-snatcher&utm_medium=footer&utm_campaign=projects"
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium text-slate-700 underline-offset-2 transition-colors duration-100 hover:underline"
+                className="font-medium text-foreground/80 underline-offset-2 transition-colors duration-100 hover:underline"
               >
                 Ajan Raj
               </a>
               . Open source{" "}
-              <Heart className="inline-block h-3 w-3 align-[-1px] text-slate-400" />{" "}
+              <Heart className="inline-block h-3 w-3 align-[-1px] text-muted-foreground/70" />{" "}
               on{" "}
               <a
                 href="https://github.com/ajanraj/font-snatcher"
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium text-slate-700 underline-offset-2 transition-colors duration-100 hover:underline"
+                className="font-medium text-foreground/80 underline-offset-2 transition-colors duration-100 hover:underline"
               >
                 GitHub
               </a>
               .
             </p>
-            <a
-              href="https://oschat.ai?utm_source=font-snatcher&utm_medium=footer&utm_campaign=projects"
-              target="_blank"
-              rel="noreferrer"
-              className="group flex items-center gap-1.5 text-xs text-slate-500 transition-colors duration-100 hover:text-slate-700"
-            >
-              <span>
-                Also check out{" "}
-                <span className="font-medium text-slate-700 underline-offset-2 group-hover:underline">
-                  OS Chat
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              <a
+                href="https://oschat.ai?utm_source=font-snatcher&utm_medium=footer&utm_campaign=projects"
+                target="_blank"
+                rel="noreferrer"
+                className="group flex items-center gap-1.5 text-xs text-muted-foreground transition-colors duration-100 hover:text-accent-foreground"
+              >
+                <span>
+                  Also check out{" "}
+                  <span className="font-medium text-foreground/80 underline-offset-2 group-hover:underline">
+                    OS Chat
+                  </span>
+                  , open-source AI assistant with 50+ models
                 </span>
-                , open-source AI assistant with 50+ models
-              </span>
-              <ArrowSquareOut
-                weight="bold"
-                className="h-3 w-3 shrink-0 opacity-50 transition-opacity group-hover:opacity-100"
-              />
-            </a>
+                <ArrowSquareOut
+                  weight="bold"
+                  className="h-3 w-3 shrink-0 opacity-50 transition-opacity group-hover:opacity-100"
+                />
+              </a>
+            </div>
           </div>
         </div>
       </footer>
