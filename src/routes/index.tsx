@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ComponentExample } from "@/components/component-example";
+import { FontSnatcherPage } from "@/features/font-snatcher/font-snatcher-page";
 
-export const Route = createFileRoute("/")({ component: App });
+export const Route = createFileRoute("/")({ component: HomePage });
 
-function App() {
-return (
-  <ComponentExample />
-);
+function HomePage() {
+  return <FontSnatcherPage />;
 }

@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "jsx-a11y", "vitest"],
+  "env": {
+    "builtin": true
+  },
+  "ignorePatterns": [
+    "src/routeTree.gen.ts",
+    ".output/**",
+    ".nitro/**",
+    ".vinxi/**",
+    "node_modules/**"
+  ]
+}
