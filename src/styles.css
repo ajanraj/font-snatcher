@@ -146,6 +146,7 @@ code {
   }
   html {
     @apply font-sans;
+    transition: background-color 150ms ease-out, color 150ms ease-out;
   }
 }
 
@@ -156,6 +157,10 @@ code {
 .dot-grid-bg {
   background-image: radial-gradient(circle at center, rgb(100 116 139 / 0.2) 1px, transparent 1px);
   background-size: 16px 16px;
+}
+
+.dark .dot-grid-bg {
+  background-image: radial-gradient(circle at center, rgb(148 163 184 / 0.15) 1px, transparent 1px);
 }
 
 /* Easing curves */
