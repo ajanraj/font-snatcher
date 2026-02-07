@@ -9,6 +9,7 @@ import {
 import type { ExtractedFontSource } from "@/features/font-snatcher/types";
 import { parseCssForFonts } from "@/server/font-extractor/css-extractor";
 import { assertSafeTargetUrl } from "@/server/font-extractor/ssrf";
+import { detectFontFormat } from "@/server/font-extractor/url-utils";
 
 interface ExtractionStats {
   stylesheetCount: number;
@@ -123,6 +124,62 @@ function collectStylesheetLinks(html: string, baseUrl: URL): string[] {
   });
 
   return discovered;
+}
+
+interface PreloadedFont {
+  url: string;
+  type: string | undefined;
+}
+
+function collectPreloadedFonts(html: string, baseUrl: URL): PreloadedFont[] {
+  const $ = load(html);
+  const fonts: PreloadedFont[] = [];
+
+  $("link[rel='preload'][as='font'][href]").each((_, element) => {
+    const href = $(element).attr("href");
+    if (!href) {
+      return;
+    }
+
+    try {
+      const resolved = new URL(href, baseUrl);
+      if (resolved.protocol === "http:" || resolved.protocol === "https:") {
+        fonts.push({
+          url: resolved.toString(),
+          type: $(element).attr("type"),
+        });
+      }
+    } catch {
+      return;
+    }
+  });
+
+  return fonts;
+}
+
+function inferFamilyFromUrl(fontUrl: string): string {
+  try {
+    const url = new URL(fontUrl);
+    const pathname = url.pathname;
+    const filename = pathname.split("/").pop() ?? "";
+    const nameWithoutExt = filename.replace(/\.[^.]+$/, "");
+
+    // Remove common suffixes like -Regular, -Bold, etc.
+    const cleaned = nameWithoutExt
+      .replace(/[-_](regular|bold|italic|light|medium|semibold|thin|black|variable|wght|ital)/gi, "")
+      .replace(/[-_]\d+/g, ""); // Remove weight numbers
+
+    // Convert kebab/snake case to title case
+    const titleCased = cleaned
+      .split(/[-_]/)
+      .filter((s) => s.length > 0)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+    return titleCased || "Unknown Font";
+  } catch {
+    return "Unknown Font";
+  }
 }
 
 function collectInlineStyles(html: string): string[] {
@@ -343,6 +400,7 @@ export async function extractFontsFromWebsite(inputUrl: URL): Promise<RawExtract
 
   const inlineStyles = collectInlineStyles(html);
   const linkedStylesheets = collectStylesheetLinks(html, inputUrl);
+  const preloadedFonts = collectPreloadedFonts(html, inputUrl);
 
   const context: CrawlContext = {
     queuedStylesheets: linkedStylesheets.map((url) => ({ url, depth: 0 })),
@@ -369,6 +427,29 @@ export async function extractFontsFromWebsite(inputUrl: URL): Promise<RawExtract
   }
 
   await crawlStylesheets(context, referer);
+
+  // Process preloaded fonts (common in Next.js, etc.)
+  // Only add if not already found via @font-face rules
+  const existingUrls = new Set(context.extractedFonts.map((f) => f.sourceUrl));
+  for (const preloaded of preloadedFonts) {
+    if (existingUrls.has(preloaded.url)) {
+      continue;
+    }
+
+    const format = detectFontFormat(preloaded.url, preloaded.type);
+    if (format === "unknown") {
+      continue;
+    }
+
+    context.extractedFonts.push({
+      family: inferFamilyFromUrl(preloaded.url),
+      style: "normal",
+      weight: null,
+      sourceUrl: preloaded.url,
+      format,
+    });
+    context.fontFaceCount += 1;
+  }
 
   const uniqueFonts = deduplicateFonts(context.extractedFonts);
 
