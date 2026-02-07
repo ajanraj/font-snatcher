@@ -47,15 +47,15 @@ export function FontCard({
   const alternativesRegionId = `${font.id}-alternatives`;
 
   return (
-    <article className="group relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow duration-150 ease-out hover:shadow-md">
+    <article className="group relative rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow duration-150 ease-out hover:shadow-md">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <TextAa weight="duotone" className="h-4 w-4 shrink-0 text-slate-400" />
-            <h3 className="truncate text-lg font-semibold text-slate-950">{font.family}</h3>
+            <TextAa weight="duotone" className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+            <h3 className="truncate text-lg font-semibold text-foreground">{font.family}</h3>
           </div>
           <a
-            className="mt-1 block truncate text-xs text-slate-500 underline-offset-2 transition-colors duration-100 ease-out hover:text-slate-700 hover:underline"
+            className="mt-1 block truncate text-xs text-muted-foreground underline-offset-2 transition-colors duration-100 ease-out hover:text-foreground/80 hover:underline"
             href={font.url}
             target="_blank"
             rel="noreferrer"
@@ -63,14 +63,14 @@ export function FontCard({
             {font.name}
           </a>
         </div>
-        <span className="shrink-0 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-blue-700">
+        <span className="shrink-0 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
           {font.format}
         </span>
       </div>
 
       <FontPreview font={font} text={FONT_PREVIEW_TEXT} />
 
-      <div className="mt-4 flex items-center gap-4 text-xs text-slate-500">
+      <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5 tabular-nums">
           <Scales weight="duotone" className="h-3.5 w-3.5" />
           {font.weight}
@@ -80,7 +80,7 @@ export function FontCard({
 
       <div className="mt-4 grid gap-2">
         <Button
-          className="h-10 gap-2 rounded-lg bg-slate-950 text-white transition-transform duration-75 ease-out active:scale-[0.97] hover:bg-slate-800"
+          className="h-10 gap-2 rounded-lg bg-foreground text-background transition-transform duration-75 ease-out active:scale-[0.97] hover:bg-foreground/90"
           onClick={() => onRequestDownload(font)}
           aria-label={`Download ${font.family}`}
         >
@@ -100,7 +100,7 @@ export function FontCard({
             <>
               <CaretUp
                 weight="bold"
-                className="h-4 w-4 text-slate-500 transition-colors duration-100 group-hover/btn:text-slate-700"
+                className="h-4 w-4 text-muted-foreground transition-colors duration-100 group-hover/btn:text-accent-foreground"
               />
               Hide Alternatives
             </>
@@ -108,7 +108,7 @@ export function FontCard({
             <>
               <CaretDown
                 weight="bold"
-                className="h-4 w-4 text-slate-500 transition-colors duration-100 group-hover/btn:text-slate-700"
+                className="h-4 w-4 text-muted-foreground transition-colors duration-100 group-hover/btn:text-accent-foreground"
               />
               Find Alternatives
             </>
@@ -121,21 +121,21 @@ export function FontCard({
           id={alternativesRegionId}
           role="region"
           aria-label={`Legal alternatives for ${font.family}`}
-          className="animate-fade-in-up mt-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3"
+          className="animate-fade-in-up mt-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 dark:border-emerald-800 dark:bg-emerald-950/50"
           style={{ willChange: "transform, opacity" }}
         >
-          <p className="mb-2 flex items-center gap-2 text-xs font-medium uppercase text-emerald-700">
+          <p className="mb-2 flex items-center gap-2 text-xs font-medium uppercase text-emerald-700 dark:text-emerald-400">
             <Scales weight="fill" className="h-3.5 w-3.5" />
             Free & legal alternatives
           </p>
           {alternativesLoading ? (
-            <div className="flex items-center gap-2 text-xs text-emerald-700">
+            <div className="flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400">
               <CircleNotch weight="bold" className="h-3.5 w-3.5 animate-spin" />
               Finding alternatives...
             </div>
           ) : null}
           {!alternativesLoading && alternatives.length === 0 ? (
-            <p className="text-xs text-emerald-700">No alternatives found yet.</p>
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">No alternatives found yet.</p>
           ) : null}
           <ul className="grid gap-2">
             {alternatives.map((alternative, index) => (
@@ -148,24 +148,24 @@ export function FontCard({
                   href={alternative.downloadUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-between rounded-md border border-emerald-200 bg-white px-3 py-2 text-sm text-slate-800 transition-colors duration-100 ease-out hover:border-emerald-300 hover:bg-emerald-50/50"
+                  className="flex items-center justify-between rounded-md border border-emerald-200 bg-card px-3 py-2 text-sm text-foreground/90 transition-colors duration-100 ease-out hover:border-emerald-300 hover:bg-emerald-50/50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/30"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-slate-900">{alternative.family}</p>
-                    <p className="truncate text-xs text-slate-500">{alternative.reason}</p>
+                    <p className="truncate font-medium text-foreground">{alternative.family}</p>
+                    <p className="truncate text-xs text-muted-foreground">{alternative.reason}</p>
                   </div>
                   <div className="ml-3 flex shrink-0 items-center gap-2">
-                    <span className="text-xs font-semibold text-emerald-700 tabular-nums">
+                    <span className="text-xs font-semibold text-emerald-700 tabular-nums dark:text-emerald-400">
                       {alternative.similarity}%
                     </span>
-                    <ArrowSquareOut weight="bold" className="h-3.5 w-3.5 text-slate-400" />
+                    <ArrowSquareOut weight="bold" className="h-3.5 w-3.5 text-muted-foreground/70" />
                   </div>
                 </a>
               </li>
             ))}
           </ul>
           {!alternativesLoading && alternatives.length > 0 ? (
-            <p className="mt-3 text-xs italic text-slate-500">
+            <p className="mt-3 text-xs italic text-muted-foreground">
               These Google Fonts are free to use commercially and personally.
             </p>
           ) : null}
