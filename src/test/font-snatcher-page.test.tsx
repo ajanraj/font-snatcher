@@ -152,6 +152,57 @@ describe("FontSnatcherPage", () => {
     });
   });
 
+  it("applies mobile overflow guards on font card content", async () => {
+    vi.mocked(fetch).mockImplementation(async (input) => {
+      const url = resolveRequestUrl(input);
+
+      if (url.includes("/api/extract")) {
+        return jsonResponse({
+          fonts: [
+            {
+              name: "UltraExtendedBrandTypeface-VeryLongAssetName.woff2",
+              family: "Ultra Extended Brand Typeface Name",
+              format: "SUPERLONGFORMATWITHOUTBREAKS",
+              url: "https://cdn.example.com/ultra-extended-brand-typeface.woff2",
+              weight: "400",
+              style: "normal",
+              referer: "https://example.com/",
+              previewUrl: "/api/font?preview=mobile-overflow",
+              downloadUrl: "/api/font?download=mobile-overflow",
+              licenseStatus: "unknown_or_paid",
+              licenseNote: "This font might not be free to use.",
+            },
+          ],
+          totalFound: 1,
+          sourceUrl: "https://example.com/",
+        });
+      }
+
+      if (url.includes("/api/font?preview=mobile-overflow")) {
+        return fontBinaryResponse();
+      }
+
+      return jsonResponse({ error: "Unhandled request" }, 500);
+    });
+
+    render(<FontSnatcherPage />);
+
+    submitExtractWithUrl("example.com");
+
+    await waitFor(() => {
+      expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
+    });
+
+    const heading = screen.getByRole("heading", { name: "Ultra Extended Brand Typeface Name" });
+    const cardArticle = heading.closest("article");
+    expect(cardArticle).not.toBeNull();
+    expect(cardArticle?.className).toContain("min-w-0");
+
+    const formatBadge = screen.getByText("SUPERLONGFORMATWITHOUTBREAKS");
+    expect(formatBadge.className).toContain("truncate");
+    expect(formatBadge.className).toContain("max-w-[7rem]");
+  });
+
   it("shows paid warning modal before download", async () => {
     vi.mocked(fetch).mockImplementation(async (input) => {
       const url = resolveRequestUrl(input);

@@ -51,7 +51,7 @@ export function FontCard({
   const actionAria = isKnownPaid ? `Get license for ${font.family}` : `Download ${font.family}`;
 
   return (
-    <article className="group relative rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow duration-150 ease-out hover:shadow-md">
+    <article className="group relative min-w-0 rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow duration-150 ease-out hover:shadow-md">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export function FontCard({
             {font.name}
           </a>
         </div>
-        <span className="shrink-0 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
+        <span className="max-w-[7rem] shrink-0 truncate rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
           {font.format}
         </span>
       </div>
@@ -84,7 +84,7 @@ export function FontCard({
 
       <div className="mt-4 grid gap-2">
         <Button
-          className="h-10 gap-2 rounded-lg bg-foreground text-background transition-transform duration-75 ease-out active:scale-[0.97] hover:bg-foreground/90"
+          className="h-10 gap-2 whitespace-normal rounded-lg bg-foreground text-center text-background transition-transform duration-75 ease-out active:scale-[0.97] hover:bg-foreground/90"
           onClick={() => onRequestDownload(font)}
           aria-label={actionAria}
         >
@@ -98,7 +98,7 @@ export function FontCard({
 
         <Button
           variant="outline"
-          className="group/btn h-10 gap-2 rounded-lg transition-colors duration-100 ease-out"
+          className="group/btn h-10 gap-2 whitespace-normal rounded-lg text-center transition-colors duration-100 ease-out"
           onClick={() => onToggleAlternatives(font, !alternativesOpen)}
           aria-label={`${alternativesOpen ? "Hide" : "Find"} legal alternatives for ${font.family}`}
           aria-expanded={alternativesOpen}
@@ -158,7 +158,7 @@ export function FontCard({
                   href={alternative.downloadUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-between rounded-md border border-emerald-200 bg-card px-3 py-2 text-sm text-foreground/90 transition-colors duration-100 ease-out hover:border-emerald-300 hover:bg-emerald-50/50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/30"
+                  className="flex min-w-0 items-center justify-between rounded-md border border-emerald-200 bg-card px-3 py-2 text-sm text-foreground/90 transition-colors duration-100 ease-out hover:border-emerald-300 hover:bg-emerald-50/50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/30"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-foreground">{alternative.family}</p>

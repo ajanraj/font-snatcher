@@ -522,7 +522,7 @@ export function FontSnatcherPage() {
               {fonts.map((font, index) => (
                 <div
                   key={font.id}
-                  className="animate-fade-in-up"
+                  className="animate-fade-in-up min-w-0"
                   style={{
                     animationDelay: `${Math.min(index * 40, 200)}ms`,
                   }}
