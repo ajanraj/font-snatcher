@@ -46,10 +46,10 @@ function buildResponse(options: BuildResponseOptions): ExtractFontsResponse {
 
   const fonts = options.fonts.map((font, index) => {
     const sourceHost = new URL(font.sourceUrl).host;
-    const license = classifyFontLicense(font.family, familyIndex);
+    const license = classifyFontLicense(font.family, familyIndex, font.sourceUrl);
 
     const alternatives =
-      license.status === "unknown_or_paid"
+      license.status !== "free_open"
         ? rankLegalAlternatives({
             family: font.family,
             style: font.style,
@@ -59,6 +59,15 @@ function buildResponse(options: BuildResponseOptions): ExtractFontsResponse {
             excludeFamilies: new Set([font.family.toLowerCase()]),
           })
         : [];
+
+    const downloadUrl =
+      license.status === "known_paid" && license.licenseUrl
+        ? license.licenseUrl
+        : createSignedProxyUrl({
+            fontUrl: font.sourceUrl,
+            referer: options.referer,
+            download: true,
+          });
 
     return {
       id: `${font.family.toLowerCase().replace(/\s+/g, "-")}-${index + 1}`,
@@ -73,13 +82,10 @@ function buildResponse(options: BuildResponseOptions): ExtractFontsResponse {
         referer: options.referer,
         download: false,
       }),
-      downloadUrl: createSignedProxyUrl({
-        fontUrl: font.sourceUrl,
-        referer: options.referer,
-        download: true,
-      }),
+      downloadUrl,
       licenseStatus: license.status,
       licenseNote: license.status === "unknown_or_paid" ? LEGAL_WARNING_COPY : license.note,
+      licenseUrl: license.licenseUrl,
       alternatives,
     };
   });
@@ -144,6 +150,7 @@ export async function extractApiResponse(inputUrl: URL): Promise<ExtractApiRespo
       downloadUrl: font.downloadUrl,
       licenseStatus: font.licenseStatus,
       licenseNote: font.licenseNote,
+      licenseUrl: font.licenseUrl,
     })),
     totalFound: richResponse.stats.uniqueFontCount,
     sourceUrl: richResponse.site.normalizedUrl,

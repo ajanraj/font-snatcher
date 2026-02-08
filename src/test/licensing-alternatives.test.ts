@@ -51,9 +51,45 @@ describe("licensing + alternatives", () => {
   it("classifies open and unknown families", () => {
     const index = buildFamilyIndex(catalog);
 
-    expect(classifyFontLicense("Inter", index).status).toBe("free_open");
-    expect(classifyFontLicense("Inter Variable", index).status).toBe("free_open");
-    expect(classifyFontLicense("Paid Brand Font", index).status).toBe("unknown_or_paid");
+    expect(
+      classifyFontLicense("Inter", index, "https://fonts.gstatic.com/s/inter/inter.woff2").status,
+    ).toBe("free_open");
+    expect(
+      classifyFontLicense(
+        "Inter Variable",
+        index,
+        "https://fonts.gstatic.com/s/inter/inter-vf.woff2",
+      ).status,
+    ).toBe("free_open");
+    expect(
+      classifyFontLicense("Paid Brand Font", index, "https://use.typekit.net/abc.css").status,
+    ).toBe("known_paid");
+    expect(classifyFontLicense("Paid Brand Font", index, "https://cdn.site/pb.woff2").status).toBe(
+      "unknown_or_paid",
+    );
+  });
+
+  it("classifies known paid families by name", () => {
+    const index = buildFamilyIndex(catalog);
+
+    expect(classifyFontLicense("Berkeley Mono", index, "https://cdn.site/font.woff2").status).toBe(
+      "known_paid",
+    );
+    expect(classifyFontLicense("Proxima Vera", index, "https://cdn.site/font.woff2").status).toBe(
+      "known_paid",
+    );
+    expect(classifyFontLicense("GT America", index, "https://cdn.site/font.woff2").status).toBe(
+      "known_paid",
+    );
+    expect(classifyFontLicense("FF DIN Pro", index, "https://cdn.site/font.woff2").status).toBe(
+      "known_paid",
+    );
+    expect(
+      classifyFontLicense("Neue Haas Grotesk Display", index, "https://cdn.site/font.woff2").status,
+    ).toBe("known_paid");
+    expect(classifyFontLicense("Circular Std", index, "https://cdn.site/font.woff2").status).toBe(
+      "known_paid",
+    );
   });
 
   it("returns top legal alternatives", () => {

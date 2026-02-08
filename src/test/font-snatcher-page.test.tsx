@@ -239,6 +239,62 @@ describe("FontSnatcherPage", () => {
     });
   });
 
+  it("redirects known paid fonts to license page", async () => {
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+
+    vi.mocked(fetch).mockImplementation(async (input) => {
+      const url = resolveRequestUrl(input);
+
+      if (url.includes("/api/extract")) {
+        return jsonResponse({
+          fonts: [
+            {
+              name: "AcuminPro-Regular.woff2",
+              family: "Acumin Pro",
+              format: "WOFF2",
+              url: "https://use.typekit.net/abc123.woff2",
+              weight: "400",
+              style: "normal",
+              referer: "https://example.com/",
+              previewUrl: "/api/font?preview=paid",
+              downloadUrl: "https://helpx.adobe.com/fonts/using/font-licensing.html",
+              licenseStatus: "known_paid",
+              licenseNote:
+                "Likely served by Adobe Fonts. Get a proper license before production use.",
+              licenseUrl: "https://helpx.adobe.com/fonts/using/font-licensing.html",
+            },
+          ],
+          totalFound: 1,
+          sourceUrl: "https://example.com/",
+        });
+      }
+
+      if (url.includes("/api/font?preview=paid")) {
+        return fontBinaryResponse();
+      }
+
+      return jsonResponse({ error: "Unhandled request" }, 500);
+    });
+
+    render(<FontSnatcherPage />);
+
+    submitExtractWithUrl("example.com");
+
+    await waitFor(() => {
+      expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
+    });
+
+    expect(screen.queryByRole("button", { name: "Get license for Acumin Pro" })).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Get license for Acumin Pro" }));
+
+    expect(openSpy).toHaveBeenCalledWith(
+      "https://helpx.adobe.com/fonts/using/font-licensing.html",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    expect(screen.queryByText("License Warning")).toBeNull();
+  });
+
   it("loads legal alternatives on demand", async () => {
     vi.mocked(fetch).mockImplementation(async (input) => {
       const url = resolveRequestUrl(input);

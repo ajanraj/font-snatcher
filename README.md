@@ -11,6 +11,7 @@ Extract web fonts from any public site. Preview, download, match legal alternati
 - Return unique fonts with format, weight, style, source URL.
 - Proxy preview/download through signed URLs (`/api/font`).
 - Label likely license status + suggest Google Fonts alternatives.
+- For known paid families, show `Get License` and open foundry/license page in a new tab.
 
 ### Stack
 
@@ -52,6 +53,13 @@ bun run fonts:refresh # refresh Google Fonts snapshot
 { "url": "https://linear.app" }
 ```
 
+Response font entries include:
+
+- `licenseStatus`: `free_open` | `known_paid` | `unknown_or_paid`
+- `licenseNote`: human-readable warning/context
+- `licenseUrl` (optional): foundry/license page for `known_paid`
+- `downloadUrl`: signed proxy URL, or foundry license URL when `known_paid`
+
 `POST /api/match`
 
 ```json
@@ -76,6 +84,12 @@ Local dev: if unset, app generates ephemeral secret automatically.
 - SSRF guardrails on extraction + font proxy targets.
 - Manual redirect handling for proxied font fetches.
 - Response size limits for HTML/CSS/font payloads.
+
+### Licensing behavior
+
+- `free_open`: direct download enabled.
+- `known_paid`: no direct font-file download; redirect to foundry/license page.
+- `unknown_or_paid`: warning modal + download still allowed.
 
 ### Deploy
 

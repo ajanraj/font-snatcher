@@ -1,6 +1,6 @@
 export type FontStyle = "normal" | "italic" | "oblique";
 
-export type FontLicenseStatus = "free_open" | "unknown_or_paid";
+export type FontLicenseStatus = "free_open" | "known_paid" | "unknown_or_paid";
 
 export type FontFormat = "woff2" | "woff" | "ttf" | "otf" | "eot" | "svg" | "unknown";
 
@@ -31,6 +31,7 @@ export interface ExtractedFont {
   downloadUrl: string;
   licenseStatus: FontLicenseStatus;
   licenseNote: string;
+  licenseUrl?: string;
   alternatives: AlternativeCandidate[];
 }
 
@@ -46,6 +47,7 @@ export interface ExtractApiFontEntry {
   downloadUrl?: string;
   licenseStatus?: FontLicenseStatus;
   licenseNote?: string;
+  licenseUrl?: string;
 }
 
 export interface ExtractApiResponse {

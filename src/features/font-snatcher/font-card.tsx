@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { FontPreview } from "@/features/font-snatcher/font-preview";
-import type { MatchAlternative } from "@/features/font-snatcher/types";
+import type { FontLicenseStatus, MatchAlternative } from "@/features/font-snatcher/types";
 import { FONT_PREVIEW_TEXT } from "@/server/font-extractor/constants";
 
 export interface FontCardModel {
@@ -23,8 +23,9 @@ export interface FontCardModel {
   referer: string;
   previewUrl: string;
   downloadUrl: string;
-  licenseStatus: "free_open" | "unknown_or_paid";
+  licenseStatus: FontLicenseStatus;
   licenseNote: string;
+  licenseUrl?: string;
 }
 
 interface FontCardProps {
@@ -45,6 +46,9 @@ export function FontCard({
   onRequestDownload,
 }: FontCardProps) {
   const alternativesRegionId = `${font.id}-alternatives`;
+  const isKnownPaid = font.licenseStatus === "known_paid";
+  const actionLabel = isKnownPaid ? "Get License" : "Download";
+  const actionAria = isKnownPaid ? `Get license for ${font.family}` : `Download ${font.family}`;
 
   return (
     <article className="group relative rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow duration-150 ease-out hover:shadow-md">
@@ -82,10 +86,14 @@ export function FontCard({
         <Button
           className="h-10 gap-2 rounded-lg bg-foreground text-background transition-transform duration-75 ease-out active:scale-[0.97] hover:bg-foreground/90"
           onClick={() => onRequestDownload(font)}
-          aria-label={`Download ${font.family}`}
+          aria-label={actionAria}
         >
-          <DownloadSimple weight="bold" className="h-4 w-4" />
-          Download
+          {isKnownPaid ? (
+            <ArrowSquareOut weight="bold" className="h-4 w-4" />
+          ) : (
+            <DownloadSimple weight="bold" className="h-4 w-4" />
+          )}
+          {actionLabel}
         </Button>
 
         <Button

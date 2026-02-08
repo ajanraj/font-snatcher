@@ -133,6 +133,10 @@ function openDownload(downloadUrl: string): void {
   window.location.assign(downloadUrl);
 }
 
+function openExternalInNewTab(url: string): void {
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
 function toCardModel(font: ExtractApiFontEntry, index: number): FontCardModel {
   return {
     id: `${font.family.toLowerCase().replace(/\s+/g, "-")}-${index + 1}`,
@@ -145,6 +149,7 @@ function toCardModel(font: ExtractApiFontEntry, index: number): FontCardModel {
     referer: font.referer,
     previewUrl: font.previewUrl ?? font.url,
     downloadUrl: font.downloadUrl ?? font.url,
+    licenseUrl: font.licenseUrl,
     licenseStatus: font.licenseStatus ?? "unknown_or_paid",
     licenseNote:
       font.licenseNote ??
@@ -359,6 +364,11 @@ export function FontSnatcherPage() {
   };
 
   const onRequestDownload = (font: FontCardModel) => {
+    if (font.licenseStatus === "known_paid") {
+      openExternalInNewTab(font.licenseUrl ?? font.downloadUrl);
+      return;
+    }
+
     if (font.licenseStatus === "unknown_or_paid") {
       setPendingPaidDownload(font);
       return;
