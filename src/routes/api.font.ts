@@ -196,11 +196,6 @@ export async function handleFontProxyRequest(request: Request): Promise<Response
   responseHeaders.set("content-type", contentType);
   responseHeaders.set("cache-control", "public, max-age=600");
 
-  const contentLength = upstream.headers.get("content-length");
-  if (contentLength) {
-    responseHeaders.set("content-length", contentLength);
-  }
-
   if (downloadFlag === "1") {
     const filename = inferDownloadName(resolvedFontUrl);
     responseHeaders.set("content-disposition", `attachment; filename="${filename}"`);

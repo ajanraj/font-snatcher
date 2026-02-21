@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiMatchRouteImport } from './routes/api.match'
 import { Route as ApiFontRouteImport } from './routes/api.font'
 import { Route as ApiExtractFontsRouteImport } from './routes/api.extract-fonts'
 import { Route as ApiExtractRouteImport } from './routes/api.extract'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const ApiExtractRoute = ApiExtractRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/terms': typeof TermsRoute
   '/api/extract': typeof ApiExtractRoute
   '/api/extract-fonts': typeof ApiExtractFontsRoute
   '/api/font': typeof ApiFontRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/terms': typeof TermsRoute
   '/api/extract': typeof ApiExtractRoute
   '/api/extract-fonts': typeof ApiExtractFontsRoute
   '/api/font': typeof ApiFontRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/terms': typeof TermsRoute
   '/api/extract': typeof ApiExtractRoute
   '/api/extract-fonts': typeof ApiExtractFontsRoute
   '/api/font': typeof ApiFontRoute
@@ -67,15 +76,23 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/terms'
     | '/api/extract'
     | '/api/extract-fonts'
     | '/api/font'
     | '/api/match'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/extract' | '/api/extract-fonts' | '/api/font' | '/api/match'
+  to:
+    | '/'
+    | '/terms'
+    | '/api/extract'
+    | '/api/extract-fonts'
+    | '/api/font'
+    | '/api/match'
   id:
     | '__root__'
     | '/'
+    | '/terms'
     | '/api/extract'
     | '/api/extract-fonts'
     | '/api/font'
@@ -84,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TermsRoute: typeof TermsRoute
   ApiExtractRoute: typeof ApiExtractRoute
   ApiExtractFontsRoute: typeof ApiExtractFontsRoute
   ApiFontRoute: typeof ApiFontRoute
@@ -92,6 +110,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -132,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TermsRoute: TermsRoute,
   ApiExtractRoute: ApiExtractRoute,
   ApiExtractFontsRoute: ApiExtractFontsRoute,
   ApiFontRoute: ApiFontRoute,

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { CircleNotch, WarningCircle } from "@phosphor-icons/react";
 import type { FontStyle } from "@/features/font-snatcher/types";
 
@@ -111,29 +112,48 @@ export function FontPreview({ font, text }: FontPreviewProps) {
       : { fontFamily: "var(--font-body)" };
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-border/50 bg-muted/50 p-4">
-      <p
-        className={`text-2xl leading-[1.4] text-balance text-foreground transition-opacity duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] ${
-          status === "loaded" ? "opacity-100" : "opacity-40"
-        }`}
+    <div className="relative overflow-hidden rounded-xl border border-border/40 bg-muted/30 p-5">
+      <motion.p
+        animate={{ opacity: status === "loaded" ? 1 : 0.3 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="text-2xl leading-[1.4] text-balance text-foreground"
         style={previewStyle}
       >
         {text}
-      </p>
-      {status === "loading" ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <CircleNotch weight="bold" className="h-3.5 w-3.5 animate-spin" />
-            Loading preview
-          </div>
-        </div>
-      ) : null}
-      {status === "failed" ? (
-        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-amber-700 dark:text-amber-400">
-          <WarningCircle weight="fill" className="h-3.5 w-3.5" />
-          Preview unavailable
-        </div>
-      ) : null}
+      </motion.p>
+
+      <AnimatePresence>
+        {status === "loading" && (
+          <motion.div
+            key="loading-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center bg-muted/50"
+          >
+            <div className="flex items-center gap-2 text-[11px] font-light text-muted-foreground">
+              <CircleNotch weight="bold" className="h-3.5 w-3.5 animate-spin" />
+              Loading preview
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {status === "failed" && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="mt-2 flex items-center gap-1.5 text-[11px] font-light text-amber-600 dark:text-amber-400"
+          >
+            <WarningCircle weight="fill" className="h-3.5 w-3.5" />
+            Preview unavailable
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

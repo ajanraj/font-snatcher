@@ -1,6 +1,8 @@
 import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import { motion } from "motion/react";
+import type { Variants } from "motion/react";
 
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import { createThemeInitScript } from "../lib/theme";
@@ -115,21 +117,70 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   notFoundComponent: RootNotFound,
 });
 
+const notFoundStagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.15 },
+  },
+};
+
+const notFoundItem: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] },
+  },
+};
+
+const spring = { type: "spring" as const, stiffness: 400, damping: 30 };
+
 function RootNotFound() {
   return (
-    <main className="mx-auto flex min-h-[40vh] max-w-3xl items-center justify-center px-6 py-16">
-      <section className="w-full rounded-2xl border border-slate-200 bg-white/90 p-8 text-center shadow-sm">
-        <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Not Found</p>
-        <h1 className="mt-2 text-3xl font-semibold text-slate-950">Page does not exist.</h1>
-        <p className="mt-2 text-sm text-slate-600">Use the main tool home route.</p>
-        <a
-          href="/"
-          className="mt-5 inline-flex rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+    <motion.main
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="mx-auto flex min-h-[40vh] max-w-3xl items-center justify-center px-6 py-16"
+    >
+      <motion.section
+        variants={notFoundStagger}
+        initial="hidden"
+        animate="visible"
+        className="w-full rounded-2xl border border-border bg-card p-10 text-center"
+      >
+        <motion.p
+          variants={notFoundItem}
+          className="text-[10px] font-light uppercase tracking-[0.3em] text-primary"
         >
-          Back Home
-        </a>
-      </section>
-    </main>
+          Not Found
+        </motion.p>
+        <motion.h1
+          variants={notFoundItem}
+          className="mt-3 font-display text-3xl text-foreground"
+        >
+          Page does not exist.
+        </motion.h1>
+        <motion.p
+          variants={notFoundItem}
+          className="mt-2 text-sm font-light text-muted-foreground"
+        >
+          Use the main tool home route.
+        </motion.p>
+        <motion.div variants={notFoundItem}>
+          <motion.a
+            href="/"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={spring}
+            className="mt-6 inline-flex rounded-xl bg-foreground px-5 py-2.5 text-sm font-light text-background transition-colors duration-150 hover:bg-foreground/85"
+          >
+            Back Home
+          </motion.a>
+        </motion.div>
+      </motion.section>
+    </motion.main>
   );
 }
 

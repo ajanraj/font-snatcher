@@ -42,7 +42,7 @@ function fontBinaryResponse(): Response {
 }
 
 function submitExtractWithUrl(url: string): void {
-  fireEvent.change(screen.getByPlaceholderText("Enter website URL"), {
+  fireEvent.change(screen.getByPlaceholderText("Enter any website URL..."), {
     target: { value: url },
   });
   fireEvent.click(screen.getByRole("button", { name: "Extract fonts from website" }));
@@ -147,7 +147,7 @@ describe("FontSnatcherPage", () => {
     submitExtractWithUrl("example.com");
 
     await waitFor(() => {
-      expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
+      expect(screen.queryByText("1 font")).not.toBeNull();
       expect(screen.queryByText("100 900")).not.toBeNull();
     });
   });
@@ -190,7 +190,7 @@ describe("FontSnatcherPage", () => {
     submitExtractWithUrl("example.com");
 
     await waitFor(() => {
-      expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
+      expect(screen.queryByText("1 font")).not.toBeNull();
     });
 
     const heading = screen.getByRole("heading", { name: "Ultra Extended Brand Typeface Name" });
@@ -278,7 +278,7 @@ describe("FontSnatcherPage", () => {
     submitExtractWithUrl("linear.app");
 
     await waitFor(() => {
-      expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
+      expect(screen.queryByText("1 font")).not.toBeNull();
     });
 
     expect(screen.queryByText("This font might not be free to use.")).toBeNull();
@@ -332,7 +332,7 @@ describe("FontSnatcherPage", () => {
     submitExtractWithUrl("example.com");
 
     await waitFor(() => {
-      expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
+      expect(screen.queryByText("1 font")).not.toBeNull();
     });
 
     expect(screen.queryByRole("button", { name: "Get license for Acumin Pro" })).not.toBeNull();
@@ -417,7 +417,7 @@ describe("FontSnatcherPage", () => {
     submitExtractWithUrl("brand.site");
 
     await waitFor(() => {
-      expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
+      expect(screen.queryByText("1 font")).not.toBeNull();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Find legal alternatives for Brand Font" }));
@@ -427,7 +427,7 @@ describe("FontSnatcherPage", () => {
       expect(screen.queryByText("86%")).not.toBeNull();
       expect(screen.queryByText("86% visual match")).not.toBeNull();
       expect(
-        screen.queryByText("These Google Fonts are free to use commercially and personally."),
+        screen.queryByText(/Google Fonts.*free for commercial and personal use/u),
       ).not.toBeNull();
     });
   });
@@ -470,7 +470,7 @@ describe("FontSnatcherPage", () => {
     submitExtractWithUrl("example.com");
 
     await waitFor(() => {
-      expect(screen.queryByText("Found 1 fonts")).not.toBeNull();
+      expect(screen.queryByText("1 font")).not.toBeNull();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Download Inter" }));

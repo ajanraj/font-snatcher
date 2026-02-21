@@ -4,91 +4,94 @@
 
 @import "shadcn/tailwind.css";
 
-@import "@fontsource-variable/sora";
-@import "@fontsource-variable/newsreader";
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "@fontsource-variable/source-serif-4";
+@import "@fontsource-variable/jetbrains-mono";
 
 @custom-variant dark (&:is(.dark *));
 
 body {
   @apply m-0;
-  font-family: "Sora Variable", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: "Plus Jakarta Sans Variable", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: "JetBrains Mono Variable", "Fira Code", monospace;
 }
 
+/* ─── Light ─── */
 :root {
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.13 0.03 265);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.29 0.07 262);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
+  --popover-foreground: oklch(0.13 0.03 265);
+  --primary: oklch(0.45 0.2 265);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.955 0.005 265);
+  --secondary-foreground: oklch(0.18 0.03 265);
+  --muted: oklch(0.955 0.005 265);
+  --muted-foreground: oklch(0.45 0.02 265);
+  --accent: oklch(0.955 0.005 265);
+  --accent-foreground: oklch(0.18 0.03 265);
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.55 0.22 27);
+  --border: oklch(0.915 0.005 265);
+  --input: oklch(0.915 0.005 265);
+  --ring: oklch(0.45 0.2 265);
+  --chart-1: oklch(0.6 0.18 265);
+  --chart-2: oklch(0.5 0.18 265);
+  --chart-3: oklch(0.4 0.15 265);
+  --chart-4: oklch(0.65 0.12 200);
+  --chart-5: oklch(0.55 0.1 200);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.29 0.07 262);
-  --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.13 0.03 265);
+  --sidebar-primary: oklch(0.45 0.2 265);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.955 0.005 265);
+  --sidebar-accent-foreground: oklch(0.18 0.03 265);
+  --sidebar-border: oklch(0.915 0.005 265);
+  --sidebar-ring: oklch(0.45 0.2 265);
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.13 0.03 265);
 }
 
+/* ─── Dark ─── */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.73 0.06 252);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --background: oklch(0.13 0.02 265);
+  --foreground: oklch(0.935 0.005 265);
+  --card: oklch(0.17 0.02 265);
+  --card-foreground: oklch(0.935 0.005 265);
+  --popover: oklch(0.17 0.02 265);
+  --popover-foreground: oklch(0.935 0.005 265);
+  --primary: oklch(0.7 0.15 265);
+  --primary-foreground: oklch(0.13 0.02 265);
+  --secondary: oklch(0.22 0.015 265);
+  --secondary-foreground: oklch(0.935 0.005 265);
+  --muted: oklch(0.2 0.015 265);
+  --muted-foreground: oklch(0.55 0.015 265);
+  --accent: oklch(0.22 0.015 265);
+  --accent-foreground: oklch(0.935 0.005 265);
+  --destructive: oklch(0.65 0.2 22);
+  --destructive-foreground: oklch(0.65 0.2 22);
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.623 0.214 259.815);
-  --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.7 0.15 265);
+  --chart-1: oklch(0.7 0.15 265);
+  --chart-2: oklch(0.6 0.15 265);
+  --chart-3: oklch(0.5 0.12 265);
+  --chart-4: oklch(0.7 0.1 200);
+  --chart-5: oklch(0.6 0.08 200);
+  --sidebar: oklch(0.17 0.02 265);
+  --sidebar-foreground: oklch(0.935 0.005 265);
+  --sidebar-primary: oklch(0.7 0.15 265);
+  --sidebar-primary-foreground: oklch(0.13 0.02 265);
+  --sidebar-accent: oklch(0.2 0.015 265);
+  --sidebar-accent-foreground: oklch(0.935 0.005 265);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: oklch(0.7 0.15 265);
 }
 
 @theme inline {
@@ -128,8 +131,9 @@ code {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: "Sora Variable", "Avenir Next", sans-serif;
-  --font-display: "Newsreader Variable", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans Variable", system-ui, sans-serif;
+  --font-display: "Source Serif 4 Variable", Georgia, serif;
+  --font-mono: "JetBrains Mono Variable", "Fira Code", monospace;
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
@@ -138,11 +142,9 @@ code {
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
-    @apply font-sans bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
   html {
     @apply font-sans;
@@ -156,27 +158,13 @@ code {
   font-family: var(--font-display);
 }
 
-.dot-grid-bg {
-  background-image: radial-gradient(circle at center, rgb(100 116 139 / 0.2) 1px, transparent 1px);
-  background-size: 16px 16px;
-}
-
-.dark .dot-grid-bg {
-  background-image: radial-gradient(circle at center, rgb(148 163 184 / 0.15) 1px, transparent 1px);
-}
-
-/* Easing curves */
+/* ─── Easing ─── */
 :root {
   --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
   --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* GPU-accelerated animation utilities */
-.will-change-transform {
-  will-change: transform;
-}
-
-/* Fade in animation - CSS only, off main thread */
+/* ─── Entrance animations ─── */
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -189,35 +177,29 @@ code {
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 250ms var(--ease-out-quart) both;
+  animation: fade-in-up 350ms var(--ease-out-quint) both;
 }
 
 .animate-fade-in-up-delay-1 {
-  animation: fade-in-up 250ms var(--ease-out-quart) 50ms both;
+  animation: fade-in-up 350ms var(--ease-out-quint) 60ms both;
 }
 
 .animate-fade-in-up-delay-2 {
-  animation: fade-in-up 250ms var(--ease-out-quart) 100ms both;
+  animation: fade-in-up 350ms var(--ease-out-quint) 120ms both;
 }
 
-/* Stagger delays for cards */
-.stagger-1 {
-  animation-delay: 30ms;
-}
-.stagger-2 {
-  animation-delay: 60ms;
-}
-.stagger-3 {
-  animation-delay: 90ms;
-}
-.stagger-4 {
-  animation-delay: 120ms;
-}
-.stagger-5 {
-  animation-delay: 150ms;
+.animate-fade-in-up-delay-3 {
+  animation: fade-in-up 350ms var(--ease-out-quint) 180ms both;
 }
 
-/* Reduced motion */
+/* ─── Stagger ─── */
+.stagger-1 { animation-delay: 40ms; }
+.stagger-2 { animation-delay: 80ms; }
+.stagger-3 { animation-delay: 120ms; }
+.stagger-4 { animation-delay: 160ms; }
+.stagger-5 { animation-delay: 200ms; }
+
+/* ─── Reduced motion ─── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

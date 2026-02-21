@@ -7,6 +7,8 @@ import {
   Scales,
   TextAa,
 } from "@phosphor-icons/react";
+import { AnimatePresence, motion } from "motion/react";
+import type { Variants } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { FontPreview } from "@/features/font-snatcher/font-preview";
 import type { FontLicenseStatus, MatchAlternative } from "@/features/font-snatcher/types";
@@ -37,6 +39,25 @@ interface FontCardProps {
   onRequestDownload: (font: FontCardModel) => void;
 }
 
+const spring = { type: "spring" as const, stiffness: 400, damping: 30 };
+
+const altList: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05, delayChildren: 0.05 },
+  },
+};
+
+const altItem: Variants = {
+  hidden: { opacity: 0, x: -8 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] },
+  },
+};
+
 export function FontCard({
   font,
   alternatives,
@@ -51,139 +72,185 @@ export function FontCard({
   const actionAria = isKnownPaid ? `Get license for ${font.family}` : `Download ${font.family}`;
 
   return (
-    <article className="group relative min-w-0 rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow duration-150 ease-out hover:shadow-md">
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <TextAa weight="duotone" className="h-4 w-4 shrink-0 text-muted-foreground/70" />
-            <h3 className="truncate text-lg font-semibold text-foreground">{font.family}</h3>
-          </div>
-          <a
-            className="mt-1 block truncate text-xs text-muted-foreground underline-offset-2 transition-colors duration-100 ease-out hover:text-foreground/80 hover:underline"
-            href={font.url}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {font.name}
-          </a>
-        </div>
-        <span className="max-w-[7rem] shrink-0 truncate rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
-          {font.format}
-        </span>
-      </div>
-
-      <FontPreview font={font} text={FONT_PREVIEW_TEXT} />
-
-      <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1.5 tabular-nums">
-          <Scales weight="duotone" className="h-3.5 w-3.5" />
-          {font.weight}
-        </span>
-        <span className="capitalize">{font.style}</span>
-      </div>
-
-      <div className="mt-4 grid gap-2">
-        <Button
-          className="h-10 gap-2 whitespace-normal rounded-lg bg-foreground text-center text-background transition-transform duration-75 ease-out active:scale-[0.97] hover:bg-foreground/90"
-          onClick={() => onRequestDownload(font)}
-          aria-label={actionAria}
-        >
-          {isKnownPaid ? (
-            <ArrowSquareOut weight="bold" className="h-4 w-4" />
-          ) : (
-            <DownloadSimple weight="bold" className="h-4 w-4" />
-          )}
-          {actionLabel}
-        </Button>
-
-        <Button
-          variant="outline"
-          className="group/btn h-10 gap-2 whitespace-normal rounded-lg text-center transition-colors duration-100 ease-out"
-          onClick={() => onToggleAlternatives(font, !alternativesOpen)}
-          aria-label={`${alternativesOpen ? "Hide" : "Find"} legal alternatives for ${font.family}`}
-          aria-expanded={alternativesOpen}
-          aria-controls={alternativesRegionId}
-        >
-          {alternativesOpen ? (
-            <>
-              <CaretUp
-                weight="bold"
-                className="h-4 w-4 text-muted-foreground transition-colors duration-100 group-hover/btn:text-accent-foreground"
-              />
-              Hide Alternatives
-            </>
-          ) : (
-            <>
-              <CaretDown
-                weight="bold"
-                className="h-4 w-4 text-muted-foreground transition-colors duration-100 group-hover/btn:text-accent-foreground"
-              />
-              Find Alternatives
-            </>
-          )}
-        </Button>
-      </div>
-
-      {alternativesOpen && (
-        <div
-          id={alternativesRegionId}
-          role="region"
-          aria-label={`Legal alternatives for ${font.family}`}
-          className="animate-fade-in-up mt-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 dark:border-emerald-800 dark:bg-emerald-950/50"
-          style={{ willChange: "transform, opacity" }}
-        >
-          <p className="mb-2 flex items-center gap-2 text-xs font-medium uppercase text-emerald-700 dark:text-emerald-400">
-            <Scales weight="fill" className="h-3.5 w-3.5" />
-            Free & legal alternatives
-          </p>
-          {alternativesLoading ? (
-            <div className="flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400">
-              <CircleNotch weight="bold" className="h-3.5 w-3.5 animate-spin" />
-              Finding alternatives...
+    <motion.article
+      whileHover={{ y: -3 }}
+      transition={spring}
+      className="group relative min-w-0 overflow-hidden rounded-2xl border border-border bg-card transition-shadow duration-200 hover:shadow-lg"
+    >
+      <div className="p-5">
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <TextAa weight="duotone" className="h-4 w-4 shrink-0 text-primary/40" />
+              <h3 className="truncate font-display text-lg text-foreground">{font.family}</h3>
             </div>
-          ) : null}
-          {!alternativesLoading && alternatives.length === 0 ? (
-            <p className="text-xs text-emerald-700 dark:text-emerald-400">
-              No alternatives found yet.
-            </p>
-          ) : null}
-          <ul className="grid gap-2">
-            {alternatives.map((alternative, index) => (
-              <li
-                key={`${font.id}-${alternative.family}`}
-                className="animate-fade-in-up"
-                style={{ animationDelay: `${index * 30}ms`, willChange: "transform, opacity" }}
-              >
-                <a
-                  href={alternative.downloadUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex min-w-0 items-center justify-between rounded-md border border-emerald-200 bg-card px-3 py-2 text-sm text-foreground/90 transition-colors duration-100 ease-out hover:border-emerald-300 hover:bg-emerald-50/50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/30"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-foreground">{alternative.family}</p>
-                    <p className="truncate text-xs text-muted-foreground">{alternative.reason}</p>
-                  </div>
-                  <div className="ml-3 flex shrink-0 items-center gap-2">
-                    <span className="text-xs font-semibold text-emerald-700 tabular-nums dark:text-emerald-400">
-                      {alternative.similarity}%
-                    </span>
-                    <ArrowSquareOut
-                      weight="bold"
-                      className="h-3.5 w-3.5 text-muted-foreground/70"
-                    />
-                  </div>
-                </a>
-              </li>
-            ))}
-          </ul>
-          {!alternativesLoading && alternatives.length > 0 ? (
-            <p className="mt-3 text-xs italic text-muted-foreground">
-              These Google Fonts are free to use commercially and personally.
-            </p>
-          ) : null}
+            <a
+              className="mt-1.5 block truncate font-mono text-[10px] font-light text-muted-foreground/60 underline-offset-3 transition-colors duration-150 hover:text-primary hover:underline"
+              href={font.url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {font.name}
+            </a>
+          </div>
+          <span className="max-w-[7rem] shrink-0 truncate rounded-full bg-primary/8 px-2.5 py-1 font-mono text-[10px] font-light uppercase tracking-wider text-primary">
+            {font.format}
+          </span>
         </div>
-      )}
-    </article>
+
+        <FontPreview font={font} text={FONT_PREVIEW_TEXT} />
+
+        <div className="mt-4 flex items-center gap-4 text-[11px] font-light text-muted-foreground/60">
+          <span className="flex items-center gap-1.5 tabular-nums">
+            <Scales weight="duotone" className="h-3.5 w-3.5 text-primary/30" />
+            {font.weight}
+          </span>
+          <span className="capitalize">{font.style}</span>
+        </div>
+
+        <div className="mt-5 grid gap-2">
+          <motion.div whileTap={{ scale: 0.97 }} transition={spring}>
+            <Button
+              className="h-10 w-full gap-2 whitespace-normal rounded-xl bg-foreground text-center text-sm font-light text-background transition-colors duration-150 hover:bg-foreground/85"
+              onClick={() => onRequestDownload(font)}
+              aria-label={actionAria}
+            >
+              {isKnownPaid ? (
+                <ArrowSquareOut weight="bold" className="h-4 w-4" />
+              ) : (
+                <DownloadSimple weight="bold" className="h-4 w-4" />
+              )}
+              {actionLabel}
+            </Button>
+          </motion.div>
+
+          <motion.div whileTap={{ scale: 0.97 }} transition={spring}>
+            <Button
+              variant="outline"
+              className="group/btn h-10 w-full gap-2 whitespace-normal rounded-xl text-center text-sm font-light transition-colors duration-150"
+              onClick={() => onToggleAlternatives(font, !alternativesOpen)}
+              aria-label={`${alternativesOpen ? "Hide" : "Find"} legal alternatives for ${font.family}`}
+              aria-expanded={alternativesOpen}
+              aria-controls={alternativesRegionId}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {alternativesOpen ? (
+                  <motion.span
+                    key="hide"
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex items-center gap-2"
+                  >
+                    <CaretUp
+                      weight="bold"
+                      className="h-4 w-4 text-muted-foreground transition-colors duration-150 group-hover/btn:text-accent-foreground"
+                    />
+                    Hide Alternatives
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="find"
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex items-center gap-2"
+                  >
+                    <CaretDown
+                      weight="bold"
+                      className="h-4 w-4 text-muted-foreground transition-colors duration-150 group-hover/btn:text-accent-foreground"
+                    />
+                    Find Alternatives
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Button>
+          </motion.div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {alternativesOpen && (
+          <motion.div
+            id={alternativesRegionId}
+            role="region"
+            aria-label={`Legal alternatives for ${font.family}`}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+            className="border-t border-emerald-200/50 bg-emerald-50/40 dark:border-emerald-900/30 dark:bg-emerald-950/20"
+          >
+            <div className="p-4">
+              <p className="mb-3 flex items-center gap-2 text-[10px] font-light uppercase tracking-[0.15em] text-emerald-700 dark:text-emerald-400">
+                <Scales weight="fill" className="h-3.5 w-3.5" />
+                Free alternatives
+              </p>
+              {alternativesLoading ? (
+                <div
+                  className="flex items-center gap-2 text-xs font-light text-emerald-700 dark:text-emerald-400"
+                >
+                  <CircleNotch weight="bold" className="h-3.5 w-3.5 animate-spin" />
+                  Searching...
+                </div>
+              ) : null}
+              {!alternativesLoading && alternatives.length === 0 ? (
+                <p
+                  className="text-xs font-light text-emerald-700/60 dark:text-emerald-400/60"
+                >
+                  No alternatives found yet.
+                </p>
+              ) : null}
+              {alternatives.length > 0 ? (
+                <motion.ul
+                  variants={altList}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid gap-2"
+                >
+                  {alternatives.map((alternative) => (
+                  <motion.li key={`${font.id}-${alternative.family}`} variants={altItem}>
+                    <motion.a
+                      href={alternative.downloadUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      whileHover={{ x: 3 }}
+                      transition={spring}
+                      className="flex min-w-0 items-center justify-between rounded-xl border border-emerald-200/40 bg-card px-3.5 py-2.5 text-sm font-light text-foreground/90 transition-colors duration-150 hover:border-emerald-300/60 hover:bg-emerald-50/30 dark:border-emerald-800/30 dark:hover:border-emerald-700/40 dark:hover:bg-emerald-950/15"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-normal text-foreground">
+                          {alternative.family}
+                        </p>
+                        <p className="truncate text-xs font-light text-muted-foreground">
+                          {alternative.reason}
+                        </p>
+                      </div>
+                      <div className="ml-3 flex shrink-0 items-center gap-2">
+                        <span className="font-mono text-xs text-emerald-700 tabular-nums dark:text-emerald-400">
+                          {alternative.similarity}%
+                        </span>
+                        <ArrowSquareOut
+                          weight="bold"
+                          className="h-3.5 w-3.5 text-muted-foreground/40"
+                        />
+                      </div>
+                    </motion.a>
+                  </motion.li>
+                ))}
+              </motion.ul>
+              ) : null}
+              {!alternativesLoading && alternatives.length > 0 ? (
+                <p className="mt-3 text-[10px] font-light text-muted-foreground/50">
+                  Google Fonts — free for commercial and personal use.
+                </p>
+              ) : null}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.article>
   );
 }

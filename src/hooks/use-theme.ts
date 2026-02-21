@@ -1,21 +1,18 @@
 import { useEffect, useState } from "react";
 import { applyThemeToRoot, getPreferredTheme, persistTheme, type Theme } from "../lib/theme";
 
-function getInitialTheme(): Theme {
-  if (typeof window === "undefined") {
-    return "light";
-  }
-
-  return getPreferredTheme(window);
-}
-
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+  const [theme, setThemeState] = useState<Theme>("light");
+  const [mounted, setMounted] = useState(false);
+
+  // Sync with real persisted theme after hydration.
+  useEffect(() => {
+    setThemeState(getPreferredTheme(window));
+    setMounted(true);
+  }, []);
 
   const setTheme = (newTheme: Theme) => {
-    if (typeof window !== "undefined") {
-      persistTheme(window, newTheme);
-    }
+    persistTheme(window, newTheme);
     setThemeState(newTheme);
   };
 
@@ -24,8 +21,9 @@ export function useTheme() {
   };
 
   useEffect(() => {
+    if (!mounted) return;
     applyThemeToRoot(document.documentElement, theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
-  return { theme, setTheme, toggleTheme } as const;
+  return { theme, mounted, setTheme, toggleTheme } as const;
 }
