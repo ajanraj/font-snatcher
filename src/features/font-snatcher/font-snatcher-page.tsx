@@ -169,7 +169,7 @@ export function FontSnatcherPage() {
         >
           {/* Header */}
           <motion.header
-            layout="position"
+            layout
             variants={heroStagger}
             initial="hidden"
             animate="visible"
@@ -185,20 +185,20 @@ export function FontSnatcherPage() {
               font from the web
             </motion.h1>
 
-            <AnimatePresence mode="wait">
-              {!hasResults && (
-                <motion.p
-                  key="subtitle"
-                  variants={fadeUp}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="mx-auto mt-8 max-w-md text-pretty text-base leading-relaxed font-light text-muted-foreground"
-                >
-                  Paste a URL. See every font. Preview, download, or find free alternatives.
-                </motion.p>
-              )}
-            </AnimatePresence>
+            <motion.div
+              initial={{ height: 0, opacity: 0, marginTop: 0 }}
+              animate={
+                hasResults
+                  ? { height: 0, opacity: 0, marginTop: 0 }
+                  : { height: "auto", opacity: 1, marginTop: 32 }
+              }
+              transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+              style={{ overflow: "hidden" }}
+            >
+              <p className="mx-auto max-w-md text-pretty text-base leading-relaxed font-light text-muted-foreground">
+                Paste a URL. See every font. Preview, download, or find free alternatives.
+              </p>
+            </motion.div>
           </motion.header>
 
           <SearchForm
@@ -308,9 +308,9 @@ export function FontSnatcherPage() {
           <div className="flex items-center gap-4">
             <Link
               to="/terms"
-              className="flex items-center gap-1.5 text-[10px] font-light text-muted-foreground underline-offset-3 transition-colors duration-150 hover:text-foreground hover:underline"
+              className="flex items-center gap-2 rounded-full border border-amber-300/50 bg-amber-50/60 px-3 py-1.5 text-[11px] font-medium text-amber-700 transition-all duration-200 hover:border-amber-400/60 hover:bg-amber-100/70 dark:border-amber-700/40 dark:bg-amber-950/40 dark:text-amber-400 dark:hover:border-amber-600/50 dark:hover:bg-amber-900/40"
             >
-              <Warning weight="fill" className="h-3 w-3 shrink-0 text-amber-500 dark:text-amber-400" />
+              <Warning weight="fill" className="h-3.5 w-3.5 shrink-0" />
               Verify font licenses before use
             </Link>
             <ThemeToggle />
