@@ -1,7 +1,7 @@
 import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import { motion } from "motion/react";
+import { LazyMotion, domMax, m } from "motion/react";
 import type { Variants } from "motion/react";
 
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
@@ -138,49 +138,51 @@ const spring = { type: "spring" as const, stiffness: 400, damping: 30 };
 
 function RootNotFound() {
   return (
-    <motion.main
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="mx-auto flex min-h-[40vh] max-w-3xl items-center justify-center px-6 py-16"
-    >
-      <motion.section
-        variants={notFoundStagger}
-        initial="hidden"
-        animate="visible"
-        className="w-full rounded-2xl border border-border bg-card p-10 text-center"
+    <LazyMotion features={domMax}>
+      <m.main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="mx-auto flex min-h-[40vh] max-w-3xl items-center justify-center px-6 py-16"
       >
-        <motion.p
-          variants={notFoundItem}
-          className="text-[10px] font-light uppercase tracking-[0.3em] text-primary"
+        <m.section
+          variants={notFoundStagger}
+          initial="hidden"
+          animate="visible"
+          className="w-full rounded-2xl border border-border bg-card p-10 text-center"
         >
-          Not Found
-        </motion.p>
-        <motion.h1
-          variants={notFoundItem}
-          className="mt-3 font-display text-3xl text-foreground"
-        >
-          Page does not exist.
-        </motion.h1>
-        <motion.p
-          variants={notFoundItem}
-          className="mt-2 text-sm font-light text-muted-foreground"
-        >
-          Use the main tool home route.
-        </motion.p>
-        <motion.div variants={notFoundItem}>
-          <motion.a
-            href="/"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            transition={spring}
-            className="mt-6 inline-flex rounded-xl bg-foreground px-5 py-2.5 text-sm font-light text-background transition-colors duration-150 hover:bg-foreground/85"
+          <m.p
+            variants={notFoundItem}
+            className="text-[10px] font-light uppercase tracking-[0.3em] text-primary"
           >
-            Back Home
-          </motion.a>
-        </motion.div>
-      </motion.section>
-    </motion.main>
+            Not Found
+          </m.p>
+          <m.h1
+            variants={notFoundItem}
+            className="mt-3 font-display text-3xl text-foreground"
+          >
+            Page does not exist.
+          </m.h1>
+          <m.p
+            variants={notFoundItem}
+            className="mt-2 text-sm font-light text-muted-foreground"
+          >
+            Use the main tool home route.
+          </m.p>
+          <m.div variants={notFoundItem}>
+            <m.a
+              href="/"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              transition={spring}
+              className="mt-6 inline-flex rounded-xl bg-foreground px-5 py-2.5 text-sm font-light text-background transition-colors duration-150 hover:bg-foreground/85"
+            >
+              Back Home
+            </m.a>
+          </m.div>
+        </m.section>
+      </m.main>
+    </LazyMotion>
   );
 }
 
@@ -190,7 +192,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }}></script>
+        <script>{themeInitScript}</script>
         <HeadContent />
         {isProduction ? (
           <script

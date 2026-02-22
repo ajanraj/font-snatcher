@@ -109,10 +109,6 @@ export interface ExtractFontsResponse {
   fonts: ExtractedFont[];
 }
 
-export interface ExtractFontsRequest {
-  url: string;
-}
-
 export interface ExtractedFontSource {
   family: string;
   style: FontStyle;

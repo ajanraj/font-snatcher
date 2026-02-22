@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useReducer } from "react";
+import { AnimatePresence, LazyMotion, domMax, m } from "motion/react";
 import { CircleNotch, WarningCircle } from "@phosphor-icons/react";
 import type { FontStyle } from "@/features/font-snatcher/types";
 
@@ -15,8 +15,25 @@ interface FontPreviewProps {
   text: string;
 }
 
+type PreviewState =
+  | { status: "idle" | "loading" | "failed" }
+  | { status: "loaded"; previewFamily: string };
+
+type PreviewAction =
+  | { type: "loading" }
+  | { type: "loaded"; previewFamily: string }
+  | { type: "failed" };
+
 const previewBufferCache = new Map<string, Promise<ArrayBuffer>>();
 const previewFamilyCache = new Map<string, string>();
+
+function previewReducer(_state: PreviewState, action: PreviewAction): PreviewState {
+  if (action.type === "loading") return { status: "loading" };
+  if (action.type === "loaded") {
+    return { status: "loaded", previewFamily: action.previewFamily };
+  }
+  return { status: "failed" };
+}
 
 function hashString(value: string): string {
   let hash = 2166136261;
@@ -77,24 +94,22 @@ async function ensurePreviewFont(font: PreviewableFont): Promise<string> {
 }
 
 export function FontPreview({ font, text }: FontPreviewProps) {
-  const [status, setStatus] = useState<"idle" | "loading" | "loaded" | "failed">("idle");
-  const [previewFamily, setPreviewFamily] = useState<string>("");
+  const [previewState, dispatch] = useReducer(previewReducer, { status: "idle" });
 
   useEffect(() => {
     let cancelled = false;
 
     const loadPreviewFont = async () => {
-      setStatus("loading");
+      dispatch({ type: "loading" });
 
       try {
         const familyName = await ensurePreviewFont(font);
         if (!cancelled) {
-          setPreviewFamily(familyName);
-          setStatus("loaded");
+          dispatch({ type: "loaded", previewFamily: familyName });
         }
       } catch {
         if (!cancelled) {
-          setStatus("failed");
+          dispatch({ type: "failed" });
         }
       }
     };
@@ -107,53 +122,55 @@ export function FontPreview({ font, text }: FontPreviewProps) {
   }, [font]);
 
   const previewStyle =
-    status === "loaded"
-      ? { fontFamily: `"${previewFamily}", serif` }
+    previewState.status === "loaded"
+      ? { fontFamily: `"${previewState.previewFamily}", serif` }
       : { fontFamily: "var(--font-body)" };
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-border/40 bg-muted/30 p-5">
-      <motion.p
-        animate={{ opacity: status === "loaded" ? 1 : 0.3 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="text-2xl leading-[1.4] text-balance text-foreground"
-        style={previewStyle}
-      >
-        {text}
-      </motion.p>
+    <LazyMotion features={domMax}>
+      <div className="relative overflow-hidden rounded-xl border border-border/40 bg-muted/30 p-5">
+        <m.p
+          animate={{ opacity: previewState.status === "loaded" ? 1 : 0.3 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="text-2xl leading-[1.4] text-balance text-foreground"
+          style={previewStyle}
+        >
+          {text}
+        </m.p>
 
-      <AnimatePresence>
-        {status === "loading" && (
-          <motion.div
-            key="loading-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0 flex items-center justify-center bg-muted/50"
-          >
-            <div className="flex items-center gap-2 text-[11px] font-light text-muted-foreground">
-              <CircleNotch weight="bold" className="h-3.5 w-3.5 animate-spin" />
-              Loading preview
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <AnimatePresence>
+          {previewState.status === "loading" && (
+            <m.div
+              key="loading-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 flex items-center justify-center bg-muted/50"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-light text-muted-foreground">
+                <CircleNotch weight="bold" className="h-3.5 w-3.5 animate-spin" />
+                Loading preview
+              </div>
+            </m.div>
+          )}
+        </AnimatePresence>
 
-      <AnimatePresence>
-        {status === "failed" && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="mt-2 flex items-center gap-1.5 text-[11px] font-light text-amber-600 dark:text-amber-400"
-          >
-            <WarningCircle weight="fill" className="h-3.5 w-3.5" />
-            Preview unavailable
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+        <AnimatePresence>
+          {previewState.status === "failed" && (
+            <m.div
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="mt-2 flex items-center gap-1.5 text-[11px] font-light text-amber-600 dark:text-amber-400"
+            >
+              <WarningCircle weight="fill" className="h-3.5 w-3.5" />
+              Preview unavailable
+            </m.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </LazyMotion>
   );
 }

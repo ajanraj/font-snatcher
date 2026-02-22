@@ -1,6 +1,24 @@
 import { afterEach, beforeEach, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { FontSnatcherPage } from "@/features/font-snatcher/font-snatcher-page";
+
+interface MockLinkProps extends ComponentPropsWithoutRef<"a"> {
+  to: string;
+  children?: ReactNode;
+}
+
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
+  return {
+    ...actual,
+    Link: ({ to, children, ...props }: MockLinkProps) => (
+      <a href={to} {...props}>
+        {children}
+      </a>
+    ),
+  };
+});
 
 class MockFontFace {
   family: string;

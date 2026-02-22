@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { extractFontsResponse } from "@/server/font-extractor";
 import { jsonError, validateExtractRequest } from "@/routes/-api.extract.shared";
 
-export async function handleExtractFontsRequest(request: Request): Promise<Response> {
+async function handleExtractFontsRequest(request: Request): Promise<Response> {
   const validated = await validateExtractRequest(request);
   if (!validated.ok) {
     return validated.response;

@@ -5,17 +5,17 @@ interface ExtractRequestBody {
   url?: string;
 }
 
-export interface ExtractRequestValidationSuccess {
+interface ExtractRequestValidationSuccess {
   ok: true;
   normalizedUrl: URL;
 }
 
-export interface ExtractRequestValidationFailure {
+interface ExtractRequestValidationFailure {
   ok: false;
   response: Response;
 }
 
-export type ExtractRequestValidationResult =
+type ExtractRequestValidationResult =
   | ExtractRequestValidationSuccess
   | ExtractRequestValidationFailure;
 
